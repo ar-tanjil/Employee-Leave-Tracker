@@ -1,3 +1,61 @@
+server:
+  port: 8080
+  servlet:
+    context-path: /api
+
+# Spring
 spring:
   application:
     name: backend
+
+  datasource:
+    url: jdbc:h2:mem:testdb
+    driverClassName: org.h2.Driver
+    username: sa
+    password:
+
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    defer-datasource-initialization: true
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: true
+
+
+  sql:
+    init:
+      mode: always
+
+  h2:
+    console:
+      enabled: true
+      path: /public/h2-console
+
+# Swagger
+springdoc:
+  api-docs:
+    enabled: true
+  swagger-ui:
+    enabled: true
+
+# JWT
+jwt:
+  secret: aflakjdfalafhalkdfhasdflkjahsdfljkahsdfalkjdfhalsdfhalskdfhasldfjahsdfljashdflajshdflasjdfhalskjdfhasljdfhaslkdfhasldfhasldfkjhasldfjashldfjkhasldfjhasdfl
+  expiration-ms: 86400000  # 24 hours
+
+
+# Logging
+logging:
+  level:
+    root: INFO
+    org:
+      hibernate:
+        event:
+          internal: DEBUG
+        session:
+          metrics: DEBUG
+        SQL: DEBUG
+        stat: DEBUG
