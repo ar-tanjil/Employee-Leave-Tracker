@@ -5,6 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.CreatedBy;
+import org.springframework.data.annotation.CreatedDate;
 
 import java.time.LocalDateTime;
 
@@ -31,7 +33,11 @@ public class UserRole {
     @JoinColumn(name = "role_id")
     private Role role;
 
-    private LocalDateTime assignedAt = LocalDateTime.now();
+    @CreatedDate
+    @Column(name = "assigned_at", updatable = false)
+    private LocalDateTime assignedAt;
 
+    @CreatedBy
+    @Column(name = "assigned_by", updatable = false)
     private Long assignedBy;
 }

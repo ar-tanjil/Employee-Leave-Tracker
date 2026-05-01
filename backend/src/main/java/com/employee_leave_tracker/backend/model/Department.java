@@ -19,11 +19,12 @@ public class Department {
 
     private String name;
 
-    private Boolean isActive = true;
-    private Boolean isDeleted = false;
+    private String code;
 
-    private LocalDateTime createdAt = LocalDateTime.now();
-    private LocalDateTime updatedAt;
+    @Column(columnDefinition = "TEXT")
+    private String description;
 
-    private Long createdBy;
+    @Column(name = "is_active", nullable = false, columnDefinition = "boolean default true")
+    private Boolean isActive;
+
 }

@@ -7,7 +7,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 @Data
 @Builder
@@ -15,14 +14,19 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Entity
 @Table(name = "employee")
-public class Employee {
+public class Employee extends Auditable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "employee_code",unique = true)
     private String employeeCode;
+
+    @Column(name = "first_name")
     private String firstName;
+
+    @Column(name = "last_name")
     private String lastName;
 
     @Column(unique = true)
@@ -40,15 +44,19 @@ public class Employee {
     @JoinColumn(name = "manager_id")
     private Employee manager;
 
+    @Column(name = "hire_date")
     private LocalDate hireDate;
+
+    @Column(name = "termination_date")
     private LocalDate terminationDate;
 
+    @Column(name = "employment_type")
     private String employmentType;
 
-    private Boolean isDeleted = false;
+    @Column(name = "is_active", nullable = false, columnDefinition = "boolean default true")
+    private Boolean isActive;
 
-    private LocalDateTime createdAt = LocalDateTime.now();
-    private LocalDateTime updatedAt;
+    @Column(name = "is_deleted", nullable = false, columnDefinition = "boolean default false")
+    private Boolean isDeleted;
 
-    private Long createdBy;
 }

@@ -15,7 +15,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.Optional;
 
 @Service
@@ -46,7 +45,6 @@ public class UserProvisioningServiceImp implements UserProvisioningService {
                 .username(username)
                 .passwordHash(passwordEncoder.encode(rawPassword))
                 .status("ACTIVE")
-                .createdAt(LocalDateTime.now())
                 .build();
 
         UserAccount saved = userAccountRepo.save(account);
@@ -66,7 +64,6 @@ public class UserProvisioningServiceImp implements UserProvisioningService {
         UserRole userRole = UserRole.builder()
                 .user(userAccount)
                 .role(defaultRole)
-                .assignedAt(LocalDateTime.now())
                 .build();
 
         userRoleRepo.save(userRole);

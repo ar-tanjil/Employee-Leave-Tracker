@@ -28,9 +28,4 @@ public class Role {
 
     @Column(name = "is_system_role", nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE")
     private Boolean isSystemRole;
-
-    @Column(name = "is_deleted", nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE")
-    private Boolean isDeleted;
-
-    private LocalDateTime createdAt = LocalDateTime.now();
 }

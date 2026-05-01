@@ -11,8 +11,6 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
-import java.time.LocalDateTime;
-
 @Component
 @RequiredArgsConstructor
 public class DataSeeder implements CommandLineRunner {
@@ -37,7 +35,6 @@ public class DataSeeder implements CommandLineRunner {
                 .passwordHash(passwordEncoder.encode("admin@123#"))
                 .status("ACTIVE")
                 .isDeleted(false)
-                .createdAt(LocalDateTime.now())
                 .build();
 
         userRepository.save(user);

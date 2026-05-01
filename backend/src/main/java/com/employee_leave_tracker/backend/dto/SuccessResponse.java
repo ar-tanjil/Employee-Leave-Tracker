@@ -18,6 +18,12 @@ public class SuccessResponse<T> extends CustomResponse {
         this.data = data;
     }
 
+    public SuccessResponse(@Nullable T data) {
+        String message = data != null ? "Data Found" : "No Data Found";
+        super(message, HttpStatus.OK.value(), HttpStatus.OK.name());
+        this.data = data;
+    }
+
     public SuccessResponse(String message) {
         super(message, HttpStatus.OK.value(), HttpStatus.OK.name());
         this.data = null;

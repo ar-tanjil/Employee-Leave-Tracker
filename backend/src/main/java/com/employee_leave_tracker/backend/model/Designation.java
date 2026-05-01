@@ -27,9 +27,7 @@ public class Designation {
     @Column(columnDefinition = "TEXT")
     private String description;
 
-    private Boolean isActive = true;
-    private Boolean isDeleted = false;
+    @Column(name = "is_active", nullable = false, columnDefinition = "boolean default true")
+    private Boolean isActive;
 
-    private LocalDateTime createdAt = LocalDateTime.now();
-    private LocalDateTime updatedAt;
 }

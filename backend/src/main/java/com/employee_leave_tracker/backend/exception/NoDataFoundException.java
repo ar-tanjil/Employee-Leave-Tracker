@@ -5,6 +5,6 @@ import org.springframework.http.HttpStatus;
 
 public class NoDataFoundException extends CustomException {
     public NoDataFoundException(String message) {
-        super(message, 800, HttpStatus.NO_CONTENT);
+        super(message, 800, HttpStatus.NOT_FOUND);
     }
 }

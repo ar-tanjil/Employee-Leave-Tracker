@@ -31,6 +31,4 @@ public class RolePermission {
     @JoinColumn(name = "permission_id")
     private Permission permission;
 
-    @Column(name = "granted_at")
-    private LocalDateTime grantedAt;
 }

@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Entity
 @Table(name = "user_account")
-public class UserAccount {
+public class UserAccount extends Auditable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -27,17 +27,17 @@ public class UserAccount {
     @Column(unique = true)
     private String username;
 
+    @Column(name = "password_hash")
     private String passwordHash;
 
+    @Column(name = "status")
     private String status = "ACTIVE";
 
+    @Column(name = "last_login_at")
     private LocalDateTime lastLoginAt;
 
-    private Boolean isDeleted ;
-
-    private LocalDateTime createdAt;
-
-    private LocalDateTime updatedAt;
+    @Column(name = "is_deleted", nullable = false, columnDefinition = "boolean default false")
+    private Boolean isDeleted;
 
     public boolean isActive() {
         return "ACTIVE".equals(status);
