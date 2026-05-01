@@ -1,13 +1,13 @@
 package com.employee_leave_tracker.backend.serviceImpl;
 
-import com.employee_leave_tracker.backend.model.Employee;
-import com.employee_leave_tracker.backend.model.Role;
-import com.employee_leave_tracker.backend.model.UserAccount;
-import com.employee_leave_tracker.backend.model.UserRole;
-import com.employee_leave_tracker.backend.repository.EmployeeRepository;
-import com.employee_leave_tracker.backend.repository.RoleRepository;
-import com.employee_leave_tracker.backend.repository.UserAccountRepository;
-import com.employee_leave_tracker.backend.repository.UserRoleRepository;
+import com.employee_leave_tracker.backend.model.employee.Employee;
+import com.employee_leave_tracker.backend.model.auth.Role;
+import com.employee_leave_tracker.backend.model.auth.UserAccount;
+import com.employee_leave_tracker.backend.model.auth.UserRole;
+import com.employee_leave_tracker.backend.repository.employee.EmployeeRepository;
+import com.employee_leave_tracker.backend.repository.auth.RoleRepository;
+import com.employee_leave_tracker.backend.repository.auth.UserAccountRepository;
+import com.employee_leave_tracker.backend.repository.auth.UserRoleRepository;
 import com.employee_leave_tracker.backend.service.UserProvisioningService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -45,6 +45,7 @@ public class UserProvisioningServiceImp implements UserProvisioningService {
                 .username(username)
                 .passwordHash(passwordEncoder.encode(rawPassword))
                 .status("ACTIVE")
+                .isDeleted(false)
                 .build();
 
         UserAccount saved = userAccountRepo.save(account);

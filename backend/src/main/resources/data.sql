@@ -16,16 +16,18 @@ INSERT INTO permission (id, resource, action, description)
 VALUES (6, 'EMPLOYEE', 'READ', 'Can view employee professional records');
 INSERT INTO permission (id, resource, action, description)
 VALUES (7, 'EMPLOYEE', 'UPDATE', 'Can edit employee information');
+INSERT INTO permission (id, resource, action, description)
+VALUES (8, 'EMPLOYEE', 'DELETE', 'Can remove employee from the system');
 
 -- Department & Designation
 INSERT INTO permission (id, resource, action, description)
-VALUES (8, 'ORGANIZATION', 'MANAGE', 'Can create/edit departments and designations');
+VALUES (9, 'ORGANIZATION', 'MANAGE', 'Can create/edit departments and designations');
 
 -- Payroll/Salary (Sensitive)
 INSERT INTO permission (id, resource, action, description)
-VALUES (9, 'PAYROLL', 'VIEW', 'Can view salary structures');
+VALUES (10, 'PAYROLL', 'VIEW', 'Can view salary structures');
 INSERT INTO permission (id, resource, action, description)
-VALUES (10, 'PAYROLL', 'EDIT', 'Can modify salary and bonuses');
+VALUES (11, 'PAYROLL', 'EDIT', 'Can modify salary and bonuses');
 
 
 -- ROLE DATA
@@ -52,7 +54,8 @@ VALUES (1, 1),
        (1, 7),
        (1, 8),
        (1, 9),
-       (1, 10);
+       (1, 10),
+       (1, 11);
 
 -- HR_ADMIN: Can manage employees and organization, but maybe not delete system users
 INSERT INTO role_permission(role_id, permission_id)

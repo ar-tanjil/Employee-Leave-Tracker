@@ -1,6 +1,6 @@
 package com.employee_leave_tracker.backend.security;
 
-import com.employee_leave_tracker.backend.model.UserAccount;
+import com.employee_leave_tracker.backend.model.auth.UserAccount;
 import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -12,6 +12,7 @@ import java.util.Set;
 public class AppUserPrincipal implements UserDetails {
 
     private final Long userId;
+    private final Long employeeId;
     private final String username;
     private final String password;
     private final boolean active;
@@ -19,6 +20,7 @@ public class AppUserPrincipal implements UserDetails {
 
     public AppUserPrincipal(UserAccount account, Set<GrantedAuthority> authorities) {
         this.userId = account.getId();
+        this.employeeId = account.getEmployee() != null ? account.getEmployee().getId() : null;
         this.username = account.getUsername();
         this.password = account.getPasswordHash();
         this.active = account.isActive();

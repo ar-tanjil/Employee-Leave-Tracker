@@ -1,37 +1,43 @@
 package com.employee_leave_tracker.backend.serviceImpl;
 
-import com.employee_leave_tracker.backend.dto.ListResponse;
-import com.employee_leave_tracker.backend.dto.SuccessResponse;
 import com.employee_leave_tracker.backend.dto.employee.*;
 import com.employee_leave_tracker.backend.exception.NoDataFoundException;
 import com.employee_leave_tracker.backend.mapper.EmployeeMapper;
-import com.employee_leave_tracker.backend.model.Department;
-import com.employee_leave_tracker.backend.model.Designation;
-import com.employee_leave_tracker.backend.model.Employee;
-import com.employee_leave_tracker.backend.repository.DepartmentRepository;
-import com.employee_leave_tracker.backend.repository.DesignationRepository;
-import com.employee_leave_tracker.backend.repository.EmployeeRepository;
+import com.employee_leave_tracker.backend.model.employee.Department;
+import com.employee_leave_tracker.backend.model.employee.Designation;
+import com.employee_leave_tracker.backend.model.employee.Employee;
+import com.employee_leave_tracker.backend.repository.auth.UserAccountRepository;
+import com.employee_leave_tracker.backend.repository.employee.DepartmentRepository;
+import com.employee_leave_tracker.backend.repository.employee.DesignationRepository;
+import com.employee_leave_tracker.backend.repository.employee.EmployeeRepository;
 import com.employee_leave_tracker.backend.service.EmployeeService;
+import com.employee_leave_tracker.backend.util.AuthUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Collection;
 
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class EmployeeServiceImpl implements EmployeeService {
 
+    private final AuthUtils authUtils;
     private final EmployeeMapper employeeMapper;
+    private final UserAccountRepository userAccountRepository;
     private final EmployeeRepository employeeRepository;
     private final DepartmentRepository departmentRepository;
     private final DesignationRepository designationRepository;
 
     @Override
     @Transactional
-    public SuccessResponse<EmployeeResDto> createOrUpdateEmployee(EmployeeReqDto reqDto) {
+    public String createOrUpdateEmployee(EmployeeReqDTO reqDto) {
         Employee employee;
+        String message;
 
         if (reqDto.id() == null) {
+            message = "Employee created successfully";
             Department department = departmentRepository.findById(reqDto.departmentId())
                     .orElseThrow(() -> new NoDataFoundException("Department not found"));
             Designation designation = designationRepository.findById(reqDto.designationId())
@@ -48,23 +54,25 @@ public class EmployeeServiceImpl implements EmployeeService {
             employee.setDepartment(department);
             employee.setDesignation(designation);
             employee.setManager(manager);
+            employee.setIsActive(true);
+            employee.setIsDeleted(false);
 
-            employee = employeeRepository.save(employee);
+            employeeRepository.save(employee);
 
         } else {
+            message = "Employee updated successfully";
             employee = employeeRepository.findById(reqDto.id())
                     .orElseThrow(() -> new NoDataFoundException("Employee not found"));
             employeeMapper.updateEmployeeFromReqDto(reqDto, employee);
         }
 
-        return new SuccessResponse<>(employeeMapper.toEmployeeResDto(employee));
+        return message;
     }
 
     @Override
-    public SuccessResponse<EmployeeResDto> getEmployeeById(Long id) {
-        var response = employeeMapper.toEmployeeResDto(employeeRepository.findById(id)
+    public EmployeeResDTO getEmployeeById(Long id) {
+        return employeeMapper.toEmployeeResDto(employeeRepository.findById(id)
                 .orElseThrow(() -> new NoDataFoundException("Employee not found")));
-        return new SuccessResponse<>(response);
     }
 
     @Override
@@ -74,25 +82,27 @@ public class EmployeeServiceImpl implements EmployeeService {
                 .orElseThrow(() -> new NoDataFoundException("Employee not found"));
 
         employee.setIsDeleted(true);
+
+        userAccountRepository.findByEmployeeId(id)
+                .ifPresent(account -> account.setIsDeleted(true));
+
     }
 
     @Override
-    public ListResponse<EmployeeTableResDto> getAllEmployees() {
-        var response = employeeRepository.findAll().stream()
+    public Collection<EmployeeTableResDTO> getAllEmployees() {
+        return employeeRepository.findAll().stream()
                 .map(employeeMapper::toEmployeeTableResDto)
                 .toList();
-        return new ListResponse<>(response);
     }
 
     @Override
-    public ListResponse<DepartmentResDto> getAllDepartments() {
-        var response = departmentRepository.findAllByIsActiveTrue();
-        return new ListResponse<>(response);
+    public Collection<DepartmentResDTO> getAllDepartments() {
+        return departmentRepository.findAllByIsActiveTrue();
+
     }
 
     @Override
-    public ListResponse<DesignationResDto> getAllDesignations() {
-        var response = designationRepository.findAllByIsActiveTrue();
-        return new ListResponse<>(response);
+    public Collection<DesignationResDTO> getAllDesignations() {
+        return designationRepository.findAllByIsActiveTrue();
     }
 }

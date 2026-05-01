@@ -1,7 +1,7 @@
 package com.employee_leave_tracker.backend.security;
 
-import com.employee_leave_tracker.backend.model.UserAccount;
-import com.employee_leave_tracker.backend.repository.UserAccountRepository;
+import com.employee_leave_tracker.backend.model.auth.UserAccount;
+import com.employee_leave_tracker.backend.repository.auth.UserAccountRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;

@@ -1,22 +1,22 @@
 package com.employee_leave_tracker.backend.service;
 
-import com.employee_leave_tracker.backend.dto.ListResponse;
-import com.employee_leave_tracker.backend.dto.SuccessResponse;
 import com.employee_leave_tracker.backend.dto.employee.*;
+
+import java.util.Collection;
 
 public interface EmployeeService {
 
-    SuccessResponse<EmployeeResDto> createOrUpdateEmployee(EmployeeReqDto reqDto);
+    String createOrUpdateEmployee(EmployeeReqDTO reqDto);
 
-    SuccessResponse<EmployeeResDto> getEmployeeById(Long id);
+    EmployeeResDTO getEmployeeById(Long id);
 
     void deleteEmployee(Long id);
 
-    ListResponse<EmployeeTableResDto> getAllEmployees();
+    Collection<EmployeeTableResDTO> getAllEmployees();
 
 
-    ListResponse<DepartmentResDto> getAllDepartments();
+    Collection<DepartmentResDTO> getAllDepartments();
 
-    ListResponse<DesignationResDto> getAllDesignations();
+    Collection<DesignationResDTO> getAllDesignations();
 
 }

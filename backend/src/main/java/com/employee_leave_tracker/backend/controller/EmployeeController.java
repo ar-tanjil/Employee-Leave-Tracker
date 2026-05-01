@@ -1,11 +1,15 @@
 package com.employee_leave_tracker.backend.controller;
 
-import com.employee_leave_tracker.backend.dto.employee.EmployeeReqDto;
+import com.employee_leave_tracker.backend.dto.CustomResponse;
+import com.employee_leave_tracker.backend.dto.ListResponse;
+import com.employee_leave_tracker.backend.dto.SuccessResponse;
+import com.employee_leave_tracker.backend.dto.employee.EmployeeReqDTO;
 import com.employee_leave_tracker.backend.service.EmployeeService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -26,36 +30,44 @@ public class EmployeeController {
 
 
     @PostMapping
-    public ResponseEntity<?> createOrUpdateEmployee(@RequestBody @Valid EmployeeReqDto reqDto) {
-        return ResponseEntity.ok(employeeService.createOrUpdateEmployee(reqDto));
+    public ResponseEntity<CustomResponse> createOrUpdateEmployee(@RequestBody @Valid EmployeeReqDTO reqDto) {
+
+        var response = employeeService.createOrUpdateEmployee(reqDto);
+
+        return ResponseEntity.ok(new SuccessResponse<>(response));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> getEmployeeById(@PathVariable Long id) {
-        return ResponseEntity.ok(employeeService.getEmployeeById(id));
+    public ResponseEntity<CustomResponse> getEmployeeById(@PathVariable Long id) {
+        var response = employeeService.getEmployeeById(id);
+        return ResponseEntity.ok(new SuccessResponse<>(response));
     }
 
 
     @GetMapping
-    public ResponseEntity<?> getAllEmployees() {
-        return ResponseEntity.ok(employeeService.getAllEmployees());
+    public ResponseEntity<CustomResponse> getAllEmployees() {
+        var response = employeeService.getAllEmployees();
+        return ResponseEntity.ok(new ListResponse<>(response));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteEmployee(@PathVariable Long id) {
+    @PreAuthorize("hasRole('ADMIN') or hasAuthority('EMPLOYEE:MANAGE')")
+    public ResponseEntity<CustomResponse> deleteEmployee(@PathVariable Long id) {
         employeeService.deleteEmployee(id);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
 
     @GetMapping("/departments")
-    public ResponseEntity<?> getAllDepartments() {
-        return ResponseEntity.ok(employeeService.getAllDepartments());
+    public ResponseEntity<CustomResponse> getAllDepartments() {
+        var response = employeeService.getAllDepartments();
+        return ResponseEntity.ok(new ListResponse<>(response));
     }
 
     @GetMapping("/designations")
-    public ResponseEntity<?> getAllDesignations() {
-        return ResponseEntity.ok(employeeService.getAllDesignations());
+    public ResponseEntity<CustomResponse> getAllDesignations() {
+        var response = employeeService.getAllDesignations();
+        return ResponseEntity.ok(new ListResponse<>(response));
     }
 
 }

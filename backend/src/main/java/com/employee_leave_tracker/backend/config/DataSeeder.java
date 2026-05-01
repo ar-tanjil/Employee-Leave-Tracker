@@ -1,11 +1,11 @@
 package com.employee_leave_tracker.backend.config;
 
-import com.employee_leave_tracker.backend.model.Role;
-import com.employee_leave_tracker.backend.model.UserAccount;
-import com.employee_leave_tracker.backend.model.UserRole;
-import com.employee_leave_tracker.backend.repository.RoleRepository;
-import com.employee_leave_tracker.backend.repository.UserAccountRepository;
-import com.employee_leave_tracker.backend.repository.UserRoleRepository;
+import com.employee_leave_tracker.backend.model.auth.Role;
+import com.employee_leave_tracker.backend.model.auth.UserAccount;
+import com.employee_leave_tracker.backend.model.auth.UserRole;
+import com.employee_leave_tracker.backend.repository.auth.RoleRepository;
+import com.employee_leave_tracker.backend.repository.auth.UserAccountRepository;
+import com.employee_leave_tracker.backend.repository.auth.UserRoleRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;

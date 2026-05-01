@@ -1,0 +1,49 @@
+package com.employee_leave_tracker.backend.model.leave;
+
+import com.employee_leave_tracker.backend.constant.ApprovalStatus;
+import com.employee_leave_tracker.backend.model.employee.Employee;
+import com.employee_leave_tracker.backend.model.workflow.ApprovalStepDefinition;
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.time.LocalDateTime;
+
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@Entity
+@Table(name = "leave_approval_instance")
+public class LeaveApprovalInstance {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @ManyToOne
+    @JoinColumn(name = "request_id")
+    private LeaveRequest leaveRequest;
+
+    @ManyToOne
+    @JoinColumn(name = "step_definition_id")
+    private ApprovalStepDefinition stepDefinition;
+
+    private Integer stepOrder;
+
+
+    @ManyToOne
+    @JoinColumn(name = "approver_id")
+    private Employee approver;
+
+    @Enumerated(EnumType.STRING)
+    private ApprovalStatus status;
+
+    private String comments;
+
+    private LocalDateTime actionDate;
+    private LocalDateTime dueDate;
+    private LocalDateTime createdAt;
+}

@@ -1,8 +1,8 @@
 package com.employee_leave_tracker.backend.security;
 
 import com.employee_leave_tracker.backend.projection.UserRoleProjection;
-import com.employee_leave_tracker.backend.repository.RolePermissionRepository;
-import com.employee_leave_tracker.backend.repository.UserRoleRepository;
+import com.employee_leave_tracker.backend.repository.auth.RolePermissionRepository;
+import com.employee_leave_tracker.backend.repository.auth.UserRoleRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
