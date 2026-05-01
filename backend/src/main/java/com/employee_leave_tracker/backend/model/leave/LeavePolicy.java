@@ -1,6 +1,5 @@
 package com.employee_leave_tracker.backend.model.leave;
 
-import com.employee_leave_tracker.backend.model.BaseAuditEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -15,7 +14,7 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @Entity
 @Table(name = "leave_policy")
-public class LeavePolicy extends BaseAuditEntity {
+public class LeavePolicy {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -31,19 +30,15 @@ public class LeavePolicy extends BaseAuditEntity {
     private Integer maxDaysPerRequest;
     private Integer minDaysNotice;
 
-    private Boolean allowCarryForward;
-    private Integer maxCarryForwardDays;
-    private Integer carryForwardExpiryMonths;
+    @Column(name = "allow_half_day")
+    private boolean allowHalfDay;
 
-    private Boolean allowHalfDay;
+    @Column(name = "employment_type", nullable = false)
+    private String employmentType;
 
-//    @Enumerated(EnumType.STRING)
-//    private AccrualType accrualType;
-
-    private String applicableEmploymentType;
-
+    @Column(name = "effective_from", nullable = false)
     private LocalDate effectiveFrom;
     private LocalDate effectiveTo;
 
-    private Boolean isActive;
+    private boolean isActive;
 }

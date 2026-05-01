@@ -1,12 +1,16 @@
 package com.employee_leave_tracker.backend.service;
 
+import com.employee_leave_tracker.backend.model.leave.LeaveBalance;
+
+import java.util.List;
+
 public interface LeaveBalanceService {
 
-    double getAvailableLeaveBalance(Long empId, Long typeId);
+    LeaveBalance getOrCreateBalance(Long employeeId, Long leaveTypeId);
 
-    void validateLeaveBalance(Long empId, Long typeId, double requestedDays);
+    List<LeaveBalance> getEmployeeBalances(Long employeeId);
 
-    void deductLeaveBalance(Long empId, Long typeId, double days);
+    void deductLeaveBalance(Long empId, Long typeId, double days, int year);
 
-    void restoreLeaveBalance(Long empId, Long typeId, double days);
+    void restoreLeaveBalance(Long empId, Long typeId, double days, int year);
 }

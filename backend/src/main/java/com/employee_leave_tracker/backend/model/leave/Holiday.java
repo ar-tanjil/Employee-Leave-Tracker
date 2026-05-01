@@ -23,7 +23,7 @@ public class Holiday {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, length = 100)
+    @Column(nullable = false, length = 200)
     private String name;
 
     @Column(name = "holiday_date", nullable = false)
@@ -32,13 +32,6 @@ public class Holiday {
     @Enumerated(EnumType.STRING)
     @Column(name = "holiday_type", length = 50)
     private HolidayType holidayType;
-
-    @Column(name = "applicable_to", length = 50)
-    private String applicableTo;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "department_id")
-    private Department department;
 
     @Column(name = "is_recurring")
     private Boolean isRecurring;

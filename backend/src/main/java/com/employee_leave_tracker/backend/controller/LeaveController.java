@@ -1,6 +1,7 @@
 package com.employee_leave_tracker.backend.controller;
 
 import com.employee_leave_tracker.backend.dto.CustomResponse;
+import com.employee_leave_tracker.backend.dto.ListResponse;
 import com.employee_leave_tracker.backend.dto.SuccessResponse;
 import com.employee_leave_tracker.backend.dto.leave.LeaveReqDTO;
 import com.employee_leave_tracker.backend.dto.workflow.ApprovalActionDTO;
@@ -28,21 +29,29 @@ public class LeaveController {
         return ResponseEntity.ok(new SuccessResponse<>(response));
     }
 
+    @GetMapping
+    @PreAuthorize("hasRole('EMPLOYEE')")
+    public ResponseEntity<CustomResponse> getLeaveRequestsByEmployee() {
+        var response = leaveRequestService.getLeaveRequestsByEmployee();
+        return ResponseEntity.ok(new ListResponse<>(response));
+    }
+
+
     @GetMapping("/cancel/{id}")
     public ResponseEntity<CustomResponse> cancelLeave(@PathVariable Long id) {
         leaveRequestService.cancelLeave(id);
         return ResponseEntity.ok(new SuccessResponse<>("Leave request cancelled successfully"));
     }
 
-    @PostMapping("/approve")
-    public ResponseEntity<CustomResponse> approveLeave(@RequestBody @Valid ApprovalActionDTO dto) {
-        leaveApprovalService.approveLeave(dto);
-        return ResponseEntity.ok(new SuccessResponse<>("Leave request approved successfully"));
-    }
-
-    @PostMapping("/reject")
-    public ResponseEntity<CustomResponse> rejectLeave(@RequestBody @Valid ApprovalActionDTO dto) {
-        leaveApprovalService.rejectLeave(dto);
-        return ResponseEntity.ok(new SuccessResponse<>("Leave request rejected successfully"));
-    }
+//    @PostMapping("/approve")
+//    public ResponseEntity<CustomResponse> approveLeave(@RequestBody @Valid ApprovalActionDTO dto) {
+//        leaveApprovalService.approveLeave(dto);
+//        return ResponseEntity.ok(new SuccessResponse<>("Leave request approved successfully"));
+//    }
+//
+//    @PostMapping("/reject")
+//    public ResponseEntity<CustomResponse> rejectLeave(@RequestBody @Valid ApprovalActionDTO dto) {
+//        leaveApprovalService.rejectLeave(dto);
+//        return ResponseEntity.ok(new SuccessResponse<>("Leave request rejected successfully"));
+//    }
 }

@@ -1,8 +1,7 @@
 package com.employee_leave_tracker.backend.model.leave;
 
 import com.employee_leave_tracker.backend.constant.ApprovalStatus;
-import com.employee_leave_tracker.backend.model.employee.Employee;
-import com.employee_leave_tracker.backend.model.workflow.ApprovalStepDefinition;
+import com.employee_leave_tracker.backend.model.workflow.WorkflowStep;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -29,21 +28,18 @@ public class LeaveApprovalInstance {
 
     @ManyToOne
     @JoinColumn(name = "step_definition_id")
-    private ApprovalStepDefinition stepDefinition;
+    private WorkflowStep stepDefinition;
 
     private Integer stepOrder;
 
-
-    @ManyToOne
-    @JoinColumn(name = "approver_id")
-    private Employee approver;
+    @Column(name = "approver_id")
+    private Long approverId;
 
     @Enumerated(EnumType.STRING)
     private ApprovalStatus status;
 
     private String comments;
+    private boolean isActive;
 
     private LocalDateTime actionDate;
-    private LocalDateTime dueDate;
-    private LocalDateTime createdAt;
 }

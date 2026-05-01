@@ -1,6 +1,6 @@
 package com.employee_leave_tracker.backend.security;
 
-import com.employee_leave_tracker.backend.projection.UserRoleProjection;
+import com.employee_leave_tracker.backend.repository.projection.UserRoleProjection;
 import com.employee_leave_tracker.backend.repository.auth.RolePermissionRepository;
 import com.employee_leave_tracker.backend.repository.auth.UserRoleRepository;
 import lombok.RequiredArgsConstructor;

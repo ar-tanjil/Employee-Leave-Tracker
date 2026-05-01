@@ -4,7 +4,6 @@ import com.employee_leave_tracker.backend.constant.LeaveDuration;
 import com.employee_leave_tracker.backend.exception.ArgumentNotValidException;
 import com.employee_leave_tracker.backend.repository.leave.HolidayRepository;
 import com.employee_leave_tracker.backend.service.LeaveCalculationService;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

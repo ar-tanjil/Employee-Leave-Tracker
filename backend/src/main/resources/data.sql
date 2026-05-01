@@ -109,3 +109,45 @@ VALUES ('Software Engineer', 'SWE', 'Responsible for developing, testing, and ma
         'Ensures product quality through rigorous testing protocols and bug tracking.', true),
        ('DevOps Engineer', 'DEVOPS', 'Bridging the gap between development and operations through CI/CD automation.',
         true);
+
+-- HOLIDAY DATA
+INSERT INTO holiday (id, name, holiday_date, holiday_type, is_recurring, is_active)
+VALUES (1, 'International Mother Language Day', '2026-02-21', 'PUBLIC', true, true),
+       (2, 'Independence Day', '2026-03-26', 'PUBLIC', true, true),
+       (3, 'Bengali New Year (Pohela Boishakh)', '2026-04-14', 'PUBLIC', true, true),
+       (4, 'Eid-ul-Fitr', '2026-03-31', 'PUBLIC', true, true),
+       (5, 'Eid-ul-Fitr Holiday', '2026-04-01', 'PUBLIC', true, true),
+       (6, 'Eid-ul-Adha', '2026-06-07', 'PUBLIC', true, true),
+       (7, 'Eid-ul-Adha Holiday', '2026-06-08', 'PUBLIC', true, true),
+       (8, 'Victory Day', '2026-12-16', 'PUBLIC', true, true),
+       (9, 'Durga Puja (Dashami)', '2026-10-22', 'OPTIONAL', true, true),
+       (10, 'Christmas Day', '2026-12-25', 'OPTIONAL', true, true),
+       (11, 'Company Foundation Day', '2026-07-15', 'COMPANY', true, true),
+       (12, 'General Bus Strick', '2026-05-15', 'COMPANY', true, true);
+
+-- LEAVE TYPE DATA
+INSERT INTO leave_type (id, name, code, description, is_paid,
+                        requires_attachment, is_active)
+VALUES (1, 'Annual Leave', 'ANNUAL', 'Yearly paid leave for employees', true, false, true),
+       (2, 'Sick Leave', 'SICK', 'Leave taken due to illness or medical condition', true, true, true),
+       (3, 'Casual Leave', 'CASUAL', 'Short-term personal leave for urgent matters', true, false, true),
+       (4, 'Maternity Leave', 'MATERNITY', 'Leave granted for childbirth and recovery', true, true, false),
+       (5, 'Paternity Leave', 'PATERNITY', 'Leave granted to fathers after childbirth', true, false, false),
+       (6, 'Unpaid Leave', 'UNPAID', 'Leave without salary deduction applies', false, false, true);
+
+
+-- LEAVE POLICY DATA
+INSERT INTO leave_policy (id, name, leave_type_id, max_days_per_year, max_days_per_request, min_days_notice,
+                          allow_half_day, employment_type, effective_from, effective_to, is_active)
+VALUES (1, 'Annual Leave Policy', 1, 20, 10, 2, true,
+        'FULL_TIME', '2026-01-01', NULL, true),
+       (2, 'Sick Leave Policy', 2, 14, 5, 0, true,
+        'ALL', '2026-01-01', NULL, true),
+       (3, 'Casual Leave Policy', 3, 10, 3, 1, true,
+        'FULL_TIME', '2026-01-01', NULL, true),
+       (4, 'Maternity Leave Policy', 4, 120, 120, 30, false,
+        'FEMALE', '2026-01-01', NULL, false),
+       (5, 'Paternity Leave Policy', 5, 7, 7, 7, false,
+        'MALE', '2026-01-01', NULL, false),
+       (6, 'Unpaid Leave Policy', 6, 60, 30, 3, true,
+        'ALL', '2026-01-01', NULL, true);

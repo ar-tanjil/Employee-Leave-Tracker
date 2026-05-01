@@ -1,7 +1,7 @@
 package com.employee_leave_tracker.backend.repository.auth;
 
 import com.employee_leave_tracker.backend.model.auth.UserRole;
-import com.employee_leave_tracker.backend.projection.UserRoleProjection;
+import com.employee_leave_tracker.backend.repository.projection.UserRoleProjection;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

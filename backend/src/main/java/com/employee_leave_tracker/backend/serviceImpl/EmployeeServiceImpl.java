@@ -6,17 +6,21 @@ import com.employee_leave_tracker.backend.mapper.EmployeeMapper;
 import com.employee_leave_tracker.backend.model.employee.Department;
 import com.employee_leave_tracker.backend.model.employee.Designation;
 import com.employee_leave_tracker.backend.model.employee.Employee;
+import com.employee_leave_tracker.backend.model.leave.LeaveType;
 import com.employee_leave_tracker.backend.repository.auth.UserAccountRepository;
 import com.employee_leave_tracker.backend.repository.employee.DepartmentRepository;
 import com.employee_leave_tracker.backend.repository.employee.DesignationRepository;
 import com.employee_leave_tracker.backend.repository.employee.EmployeeRepository;
+import com.employee_leave_tracker.backend.repository.leave.LeaveTypeRepository;
 import com.employee_leave_tracker.backend.service.EmployeeService;
+import com.employee_leave_tracker.backend.service.LeaveBalanceService;
 import com.employee_leave_tracker.backend.util.AuthUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collection;
+import java.util.List;
 
 @Service
 @Transactional(readOnly = true)
@@ -29,6 +33,8 @@ public class EmployeeServiceImpl implements EmployeeService {
     private final EmployeeRepository employeeRepository;
     private final DepartmentRepository departmentRepository;
     private final DesignationRepository designationRepository;
+    private final LeaveTypeRepository leaveTypeRepository;
+    private final LeaveBalanceService leaveBalanceService;
 
     @Override
     @Transactional
@@ -66,7 +72,17 @@ public class EmployeeServiceImpl implements EmployeeService {
             employeeMapper.updateEmployeeFromReqDto(reqDto, employee);
         }
 
+        initializeEmployeeLeaveBalances(employee);
+
         return message;
+    }
+
+    private void initializeEmployeeLeaveBalances(Employee employee) {
+        List<LeaveType> activeLeaveTypes = leaveTypeRepository.findByIsActive(true);
+        for (LeaveType leaveType : activeLeaveTypes) {
+            // This will create balance only if active policy exists
+            leaveBalanceService.getOrCreateBalance(employee.getId(), leaveType.getId());
+        }
     }
 
     @Override

@@ -44,14 +44,15 @@ public class LeaveRequest extends BaseAuditEntity {
     @Column(name = "total_days", nullable = false)
     private Double totalDays;
 
-
     @Enumerated(EnumType.STRING)
+    @Column(name = "leave_duration", nullable = false)
     private LeaveDuration leaveDuration;
 
     @Column(columnDefinition = "TEXT")
     private String reason;
 
     @Enumerated(EnumType.STRING)
+    @Column(name = "status", nullable = false)
     private LeaveStatus status;
 
     @Column(name = "current_approval_step")
