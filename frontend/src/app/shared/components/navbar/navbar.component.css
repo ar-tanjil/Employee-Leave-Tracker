@@ -1,0 +1,15 @@
+@reference "../../../../styles.css";
+
+@layer components {
+  .nav-link {
+    @apply px-3 py-2 rounded-md text-gray-600 transition font-medium;
+  }
+
+  .nav-link:hover {
+    @apply text-blue-500 bg-blue-50;
+  }
+
+  .active-link {
+    @apply text-blue-600 bg-blue-100 font-semibold;
+  }
+}

@@ -1,0 +1,47 @@
+<div class="main">
+  <div class="card">
+    <p class="text-zinc-950 text-2xl font-bold text-center mb-1 tracking-wider">
+      {{appName}}
+    </p>
+    <h1 class="text-xl font-semibold text-zinc-950 mb-1">
+      <span class="text-teal-400">›</span> Sign In
+    </h1>
+
+    <form [formGroup]="form" (ngSubmit)="login()" class="p-6 space-y-5 w-md">
+      <!-- Name + Email -->
+      <div class="grid grid-cols-1 sm:grid-cols-1 gap-4">
+        <div>
+          <label class="formLabel">Username
+            @if (isRequired('username')) {
+            <span class="text-red-500">*</span>
+            }
+          </label>
+          <input formControlName="username" type="text" placeholder="ashiq" class="formInput"
+            [class.border-slate-700]="!isInvalid('username')" [class.focus:border-cyan-500]="!isInvalid('username')"
+            [class.border-red-500]="isInvalid('username')" />
+          @if (isInvalid('username')) {
+          <p class="text-red-400 text-xs mt-1">
+            Username is required (min 3 chars).
+          </p>
+          }
+        </div>
+
+        <div>
+          <label class="formLabel">Password
+            @if (isRequired('password')) {
+            <span class="text-red-500">*</span>
+            }
+          </label>
+          <input formControlName="password" type="password" placeholder="••••••••" class="formInput"
+            [class.border-slate-700]="!isInvalid('password')" [class.border-red-500]="isInvalid('password')" />
+          @if (isInvalid('password')) {
+          <p class="text-red-400 text-xs mt-1">Password is required (min 6 chars).</p>
+          }
+        </div>
+      </div>
+      <div class="flex items-center justify-center gap-3 pt-2 border-t border-slate-800">
+        <button class="btn-primary" type="submit">Login</button>
+      </div>
+    </form>
+  </div>
+</div>

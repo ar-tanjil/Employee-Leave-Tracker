@@ -1,0 +1,79 @@
+<header class="bg-white shadow-md sticky top-0 z-50">
+  <div class="max-w-7xl mx-auto px-4">
+    <div class="flex justify-between items-center h-16">
+
+      <!-- Logo -->
+      <div class="text-xl font-bold text-gray-800">
+        {{applicationName}}
+      </div>
+
+      <!-- Desktop Nav -->
+      <nav class="hidden md:flex space-x-8">
+        <a routerLink="/" routerLinkActive="active-link" [routerLinkActiveOptions]="{ exact: true }"
+          class="nav-link cursor-pointer">Dashboard</a>
+
+        <a [routerLink]="['/employee']" routerLinkActive="active-link" class="nav-link cursor-pointer">Employee</a>
+
+        <a [routerLink]="['/leave']" routerLinkActive="active-link" class="nav-link cursor-pointer">Leave</a>
+
+        <a [routerLink]="['/profile']" routerLinkActive="active-link" class="nav-link cursor-pointer">Profile</a>
+      </nav>
+
+      <!-- Desktop Button -->
+      <div class="hidden md:block">
+        <a class="px-4 py-2 btn-danger cursor-pointer" (click)="confirmLogout()">
+          Logout
+        </a>
+      </div>
+
+      <!-- Mobile Menu Button -->
+      <button class="md:hidden text-2xl text-gray-700 cursor-pointer" (click)="toggleMenu()">
+        ☰
+      </button>
+
+    </div>
+  </div>
+</header>
+
+<!-- Backdrop -->
+
+@if (
+isMenuOpen()
+) {
+<div class="fixed inset-0 bg-black/10 backdrop-blur-xs z-40" (click)="closeMenu()"></div>
+}
+
+
+<!-- Mobile Drawer -->
+<div class="fixed top-0 right-0 h-full w-72 bg-white z-50 shadow-lg transform transition-transform duration-300"
+  [class.translate-x-0]="isMenuOpen()" [class.translate-x-full]="!isMenuOpen()">
+
+  <div class="flex justify-between items-center p-4 border-b">
+    <span class="font-bold text-lg">Menu</span>
+    <button (click)="closeMenu()" class="text-2xl">&times;</button>
+  </div>
+
+  <nav class="flex flex-col p-4 space-y-4">
+
+    <a [routerLink]="['/']" (click)="closeMenu()" routerLinkActive="active-link"
+      [routerLinkActiveOptions]="{ exact: true }" class="nav-link-mobile cursor-pointer">
+      Home
+    </a>
+
+    <a [routerLink]="['/about']" (click)="closeMenu()" routerLinkActive="active-link"
+      class="nav-link-mobile cursor-pointer">
+      About
+    </a>
+
+    <a [routerLink]="['/services']" (click)="closeMenu()" routerLinkActive="active-link"
+      class="nav-link-mobile cursor-pointer">
+      Services
+    </a>
+
+    <a [routerLink]="['/contact']" (click)="closeMenu()" routerLinkActive="active-link"
+      class="nav-link-mobile cursor-pointer">
+      Contact
+    </a>
+
+  </nav>
+</div>

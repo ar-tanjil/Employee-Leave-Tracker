@@ -1,0 +1,21 @@
+@reference "../../../../../styles.css";
+
+@layer components {
+  .main {
+    @apply  min-h-screen flex items-center justify-center  font-mono;
+  }
+
+   .card {
+    @apply p-2 bg-zinc-300 border text-zinc-900 rounded-2xl max-w-2xl shadow-2xl
+    max-h-[90vh] overflow-y-auto mx-auto;
+  }
+  .formInput {
+    @apply w-full px-3 py-2 bg-zinc-50 border rounded-lg text-sm text-zinc-950
+     placeholder-zinc-500 focus:outline-none transition-colors duration-150 font-bold;
+  }
+
+  .formLabel {
+    @apply block text-lg font-medium mb-1.5;
+  }
+
+}
