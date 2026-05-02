@@ -22,7 +22,7 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<CustomResponse> login(@RequestBody @Valid LoginRequest request) {
         var response = authService.login(request);
-        return ResponseEntity.ok(new SuccessResponse<>(response));
+        return ResponseEntity.ok(new SuccessResponse<>(response, "Login successful"));
     }
 
     @PostMapping("/provision-user-from-employee")

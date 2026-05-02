@@ -2,6 +2,7 @@ package com.employee_leave_tracker.backend.serviceImpl;
 
 import com.employee_leave_tracker.backend.dto.auth.LoginRequest;
 import com.employee_leave_tracker.backend.dto.auth.LoginResponse;
+import com.employee_leave_tracker.backend.exception.UnauthorizedException;
 import com.employee_leave_tracker.backend.security.AppUserPrincipal;
 import com.employee_leave_tracker.backend.security.JwtUtil;
 import com.employee_leave_tracker.backend.service.AuthService;
@@ -28,14 +29,13 @@ public class AuthServiceImpl implements AuthService {
         );
 
         AppUserPrincipal principal = (AppUserPrincipal) auth.getPrincipal();
+
+        if (principal == null) {
+            throw new UnauthorizedException("Invalid credentials");
+        }
+
         String token = jwtUtil.generateToken(principal);
 
-
-        List<String> roles = principal.getAuthorities().stream()
-                .map(GrantedAuthority::getAuthority)
-                .filter(a -> a.startsWith("ROLE_"))
-                .toList();
-
-        return new LoginResponse(token, principal.getUsername(), roles);
+        return new LoginResponse(token);
     }
 }
