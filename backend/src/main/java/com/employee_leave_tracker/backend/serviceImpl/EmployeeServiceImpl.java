@@ -16,6 +16,8 @@ import com.employee_leave_tracker.backend.service.EmployeeService;
 import com.employee_leave_tracker.backend.service.LeaveBalanceService;
 import com.employee_leave_tracker.backend.util.AuthUtils;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -72,7 +74,8 @@ public class EmployeeServiceImpl implements EmployeeService {
             employeeMapper.updateEmployeeFromReqDto(reqDto, employee);
         }
 
-        initializeEmployeeLeaveBalances(employee);
+        // TODO: NEED DIFFERENT METHOD WITHOUT LEAVE TYPE
+//        initializeEmployeeLeaveBalances(employee);
 
         return message;
     }
@@ -87,7 +90,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @Override
     public EmployeeResDTO getEmployeeById(Long id) {
-        return employeeMapper.toEmployeeResDto(employeeRepository.findById(id)
+        return employeeMapper.toEmployeeResDto(employeeRepository.findEmployeeById(id)
                 .orElseThrow(() -> new NoDataFoundException("Employee not found")));
     }
 
@@ -105,10 +108,9 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
-    public Collection<EmployeeTableResDTO> getAllEmployees() {
-        return employeeRepository.findAll().stream()
-                .map(employeeMapper::toEmployeeTableResDto)
-                .toList();
+    public Page<EmployeeTableResDTO> getAllEmployees(Pageable pageable) {
+        return employeeRepository.findAllEmployee(pageable)
+                .map(employeeMapper::toEmployeeTableResDto);
     }
 
     @Override

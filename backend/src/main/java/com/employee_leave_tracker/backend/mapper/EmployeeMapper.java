@@ -16,6 +16,12 @@ public interface EmployeeMapper {
 
     EmployeeReqDTO toEmployeeReqDto(Employee employee);
 
+    @Mapping(target = "designationName", source = "designation.name")
+    @Mapping(target = "designationId", source = "designation.id")
+    @Mapping(target = "departmentName", source = "department.name")
+    @Mapping(target = "departmentId", source = "department.id")
+    @Mapping(target = "managerName", source = "manager.firstName")
+    @Mapping(target = "managerId", source = "manager.id")
     EmployeeResDTO toEmployeeResDto(Employee employee);
 
     @Mapping(target = "designation", source = "designation.name")

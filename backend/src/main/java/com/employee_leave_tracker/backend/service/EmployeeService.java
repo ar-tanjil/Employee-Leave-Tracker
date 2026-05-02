@@ -1,6 +1,8 @@
 package com.employee_leave_tracker.backend.service;
 
 import com.employee_leave_tracker.backend.dto.employee.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.Collection;
 
@@ -12,7 +14,7 @@ public interface EmployeeService {
 
     void deleteEmployee(Long id);
 
-    Collection<EmployeeTableResDTO> getAllEmployees();
+    Page<EmployeeTableResDTO> getAllEmployees(Pageable pageable);
 
 
     Collection<DepartmentResDTO> getAllDepartments();
