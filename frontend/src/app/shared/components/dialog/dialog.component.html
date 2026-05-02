@@ -1,0 +1,19 @@
+@if (!loading()) {
+<!-- Backdrop -->
+<div class="backdrop" (click)="onBackdropClick($event)">
+  <!-- Modal -->
+  <div class="dialog" (click)="$event.stopPropagation()">
+    <!-- Header -->
+    <div class="header">
+      <h2 class="text-lg font-semibold ">
+        {{ title() }}
+      </h2>
+      <button (click)="close.emit()" class=" cursor-pointer hover:text-cyan-950 font-bold transition-colors p-1">
+        ✕
+      </button>
+    </div>
+
+    <ng-content />
+  </div>
+</div>
+}

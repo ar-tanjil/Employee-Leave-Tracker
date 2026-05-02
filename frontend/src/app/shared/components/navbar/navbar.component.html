@@ -1,5 +1,5 @@
 <header class="bg-white shadow-md sticky top-0 z-50">
-  <div class="max-w-7xl mx-auto px-4">
+  <div class="mx-auto px-4">
     <div class="flex justify-between items-center h-16">
 
       <!-- Logo -->
@@ -9,7 +9,7 @@
 
       <!-- Desktop Nav -->
       <nav class="hidden md:flex space-x-8">
-        <a routerLink="/" routerLinkActive="active-link" [routerLinkActiveOptions]="{ exact: true }"
+        <a [routerLink]="['/dashboard']" routerLinkActive="active-link" [routerLinkActiveOptions]="{ exact: true }"
           class="nav-link cursor-pointer">Dashboard</a>
 
         <a [routerLink]="['/employee']" routerLinkActive="active-link" class="nav-link cursor-pointer">Employee</a>

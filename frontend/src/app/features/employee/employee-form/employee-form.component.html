@@ -1,0 +1,145 @@
+<app-dialog title="Employee Registration" (close)="onCancelled.emit()">
+  <div class="mx-auto  p-2 bg-white border border-gray-200">
+    <form [formGroup]="employeeForm" (ngSubmit)="onSubmit()" class="space-y-6">
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+        <!-- Employee Code -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700">Employee Code</label>
+          <input type="text" formControlName="employeeCode" [readOnly]="isEditing()"
+            class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+
+          @if (isInvalid('employeeCode')) {
+          <p class="text-red-400 text-xs mt-1">
+            Employee Code is required.
+          </p>
+          }
+        </div>
+
+        <!-- Email -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700">Email Address</label>
+          <input type="email" formControlName="email"
+            class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+
+          @if (isInvalid('email')) {
+          <p class="text-red-400 text-xs mt-1">
+            Email is required and must be valid.
+          </p>
+          }
+        </div>
+
+        <!-- First Name -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700">First Name</label>
+          <input type="text" formControlName="firstName"
+            class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+
+          @if (isInvalid('firstName')) {
+          <p class="text-red-400 text-xs mt-1">
+            First Name is required.
+          </p>
+          }
+        </div>
+
+        <!-- Last Name -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700">Last Name</label>
+          <input type="text" formControlName="lastName"
+            class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+
+          @if (isInvalid('lastName')) {
+          <p class="text-red-400 text-xs mt-1">
+            Last Name is required.
+          </p>
+          }
+        </div>
+
+        <!-- Department -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700">Department ID</label>
+          <select formControlName="departmentId"
+            class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+
+            @for (data of departments(); track $index) {
+            <option [value]="data.id">{{ data.name }}</option>
+            }
+          </select>
+
+          @if (isInvalid('departmentId')) {
+          <p class="text-red-400 text-xs mt-1">
+            Department is required.
+          </p>
+          }
+        </div>
+
+        <!-- Designation -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700">Designation ID</label>
+
+          <select formControlName="designationId"
+            class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+
+            @for (data of designations(); track $index) {
+            <option [value]="data.id">{{ data.name }}</option>
+            }
+          </select>
+
+          @if (isInvalid('designationId')) {
+          <p class="text-red-400 text-xs mt-1">
+            Designation is required.
+          </p>
+          }
+
+        </div>
+
+        <!-- Hire Date -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700">Hire Date</label>
+          <input type="date" formControlName="hireDate"
+            class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+
+          @if (isInvalid('hireDate')) {
+          <p class="text-red-400 text-xs mt-1">
+            Hire Date is required.
+          </p>
+          }
+
+        </div>
+
+        <!-- Employment Type -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700">Employment Type</label>
+          <select formControlName="employmentType"
+            class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+
+            @for (empType of employmentTypes ; track $index) {
+            <option [value]="empType.key">{{ empType.value }}</option>
+            }
+          </select>
+
+          @if (isInvalid('employmentType')) {
+          <p class="text-red-400 text-xs mt-1">
+            Employment Type is required.
+          </p>
+          }
+        </div>
+
+      </div>
+
+      <!-- Submit Button -->
+      <div class="flex justify-end pt-4">
+        <button type="button" (click)="employeeForm.reset()"
+          class="mr-4 bg-white py-2 cursor-pointer px-4 border border-gray-300 rounded-md  text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none">
+          Clear
+        </button>
+        <button type="submit" [disabled]="employeeForm.invalid"
+          class="inline-flex cursor-pointer justify-center py-2 px-6 border border-transparent  text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:bg-gray-400">
+          Save Employee
+        </button>
+      </div>
+
+    </form>
+  </div>
+</app-dialog>

@@ -19,6 +19,12 @@ export const appConfig: ApplicationConfig = {
         visibleToasts: 5,
         duration: 4000,
         dismissible: true,
+        style: {
+          padding: '14px',
+          margin: '10px',
+          marginTop: '60px',
+          borderRadius: '8px',
+        },
       }
     ),
   ],

@@ -1,0 +1,28 @@
+@reference "../../../../styles.css";
+
+@layer components {
+
+
+  .selectPage {
+    @apply px-3 py-2 bg-teal-900 border border-slate-700 rounded-lg
+      text-sm text-slate-300 focus:outline-none focus:border-cyan-500;
+  }
+  .userTh {
+    @apply px-4 py-3 text-left text-xs font-semibold text-teal-400 uppercase
+        tracking-widest;
+  }
+
+  .editBtn {
+    @apply cursor-pointer inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-medium
+           bg-indigo-50 text-indigo-600 hover:bg-indigo-100 transition-colors;
+  }
+  .viewBtn {
+    @apply cursor-pointer inline-flex items-center gap-1 px-3 py-1.5 rounded-lg
+    text-xs font-medium bg-slate-100 text-slate-600 hover:bg-slate-200 transition-colors;
+  }
+
+  .deleteBtn {
+    @apply cursor-pointer px-3 py-1 text-xs bg-red-900/50 hover:bg-red-800/60 rounded
+         text-red-400 hover:text-red-300 transition-colors duration-100;
+  }
+}

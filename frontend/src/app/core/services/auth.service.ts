@@ -75,5 +75,12 @@ export class AuthService {
     };
   }
 
+  hasRoles(roles: string[]): boolean {
+    const user = this.currentUser();
+    if (!user || !user.roles) {
+      return false;
+    }
+    return roles.some(role => user.roles!.includes(role));
+  }
 
 }

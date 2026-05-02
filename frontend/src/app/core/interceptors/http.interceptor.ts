@@ -3,25 +3,21 @@ import {
   HttpResponse,
   HttpErrorResponse
 } from '@angular/common/http';
-import { inject } from '@angular/core';
+import { inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { HotToastService } from '@ngxpert/hot-toast';
 import { NgxSpinnerService } from 'ngx-spinner';
 import { catchError, throwError, finalize, tap, retry } from 'rxjs';
-
 import { ApiError, ApiResponse } from '../../models/api-response.model';
-
-// Track active requests globally
-let activeRequests = 0;
+import { LoadingService } from '../services/loading.service';
 
 export const httpInterceptor: HttpInterceptorFn = (req, next) => {
   const toast = inject(HotToastService);
-  const spinner = inject(NgxSpinnerService);
-  const router = inject(Router);
+  const loadingService = inject(LoadingService);
 
   const isModifyRequest = ['POST', 'PUT', 'PATCH', 'DELETE'].includes(req.method);
 
-  handleSpinnerShow(spinner);
+  loadingService.show();
 
   return next(req).pipe(
 
@@ -44,23 +40,10 @@ export const httpInterceptor: HttpInterceptorFn = (req, next) => {
 
       return throwError(() => apiError);
     }),
-    finalize(() => handleSpinnerHide(spinner))
+    finalize(() => loadingService.hide())
   );
 };
 
-
-function handleSpinnerShow(spinner: NgxSpinnerService) {
-  activeRequests++;
-  spinner.show();
-}
-
-function handleSpinnerHide(spinner: NgxSpinnerService) {
-  activeRequests--;
-  if (activeRequests <= 0) {
-    activeRequests = 0;
-    spinner.hide();
-  }
-}
 
 function mapApiError(error: HttpErrorResponse): ApiError {
   return {
@@ -70,7 +53,6 @@ function mapApiError(error: HttpErrorResponse): ApiError {
     code: error.error?.code ?? null,
   };
 }
-
 
 
 function handleUnauthorized(router: Router, toast: HotToastService) {

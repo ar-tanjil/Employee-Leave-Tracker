@@ -28,10 +28,12 @@ export class ApiService {
     }
 
     return this.http
-      .get<T>(this.buildUrl(endpoint), {
+      .get<ApiResponse<T>>(this.buildUrl(endpoint), {
         params: httpParams,
       })
-      .pipe(retry({ count: 2, delay: 1000 },),
+      .pipe(
+        // retry({ count: 2, delay: 1000 }),
+        map(res => res.data),
         catchError(this._handleError),);
   }
 
@@ -42,8 +44,8 @@ export class ApiService {
     extraParams?: Record<string, string | number | boolean>,
   ): Observable<PagedResponse<T>> {
     const params: Record<string, string | number | boolean> = {
-      _page: pagination.page,
-      _limit: pagination.pageSize,
+      page: pagination.page,
+      size: pagination.pageSize,
       ...extraParams,
     };
 
@@ -61,27 +63,11 @@ export class ApiService {
     });
 
     return this.http
-      .get<T[]>(this.buildUrl(endpoint), {
-        params: httpParams,
-        observe: 'response',
+      .get<PagedResponse<T>>(this.buildUrl(endpoint), {
+        params: httpParams
       })
       .pipe(
-        retry({ count: 2, delay: 1000 }),
-        map((response) => {
-          const total = parseInt(
-            response.headers.get('X-Total-Count') ?? '0',
-            10,
-          );
-          const data = response.body ?? [];
-
-          return {
-            data,
-            total,
-            page: pagination.page,
-            pageSize: pagination.pageSize,
-            totalPages: Math.ceil(total / pagination.pageSize),
-          } satisfies PagedResponse<T>;
-        }),
+        // retry({ count: 2, delay: 1000 }),
         catchError(this._handleError),
       );
   }
@@ -104,8 +90,10 @@ export class ApiService {
     body: TBody,
   ): Observable<TResponse> {
     return this.http
-      .put<TResponse>(this.buildUrl(endpoint), body)
-      .pipe(catchError(this._handleError));
+      .put<ApiResponse<TResponse>>(this.buildUrl(endpoint), body)
+      .pipe(map(res => res.data),
+        catchError(this._handleError)
+      );
   }
 
   // patch
@@ -114,15 +102,19 @@ export class ApiService {
     body: Partial<TBody>,
   ): Observable<TResponse> {
     return this.http
-      .patch<TResponse>(this.buildUrl(endpoint), body)
-      .pipe(catchError(this._handleError));
+      .patch<ApiResponse<TResponse>>(this.buildUrl(endpoint), body)
+      .pipe(map(res => res.data),
+        catchError(this._handleError)
+      );
   }
 
   // delete
   delete<T>(endpoint: string): Observable<T> {
     return this.http
-      .delete<T>(this.buildUrl(endpoint))
-      .pipe(catchError(this._handleError));
+      .delete<ApiResponse<T>>(this.buildUrl(endpoint))
+      .pipe(map(res => res.data),
+        catchError(this._handleError)
+      );
   }
 
   // The global error interceptor also catches & shows toasts, so services stay clean

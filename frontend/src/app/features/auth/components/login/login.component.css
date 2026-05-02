@@ -6,7 +6,7 @@
   }
 
    .card {
-    @apply p-2 bg-zinc-300 border text-zinc-900 rounded-2xl max-w-2xl shadow-2xl
+    @apply p-2 bg-blue-50 border text-zinc-900 rounded-2xl max-w-2xl shadow-2xl
     max-h-[90vh] overflow-y-auto mx-auto;
   }
   .formInput {

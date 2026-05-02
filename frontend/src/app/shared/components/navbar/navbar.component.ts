@@ -37,9 +37,6 @@ export class NavbarComponent {
 
 
   // logout function
-
-
-
 async confirmLogout() {
   const result = await Swal.fire({
     title: 'Logout',

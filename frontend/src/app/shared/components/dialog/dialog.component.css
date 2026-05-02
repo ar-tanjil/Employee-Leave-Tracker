@@ -1,0 +1,16 @@
+@reference "../../../../styles.css";
+
+@layer components {
+  .backdrop {
+    @apply fixed inset-0 bg-zinc-50/5 backdrop-blur-xs flex
+     items-center justify-center z-50 p-4 @container;
+  }
+
+  .dialog {
+    @apply bg-zinc-50 rounded-2xl w-full
+    xl:max-w-5xl max-w-3xl shadow-2xl shadow-zinc-900/20 max-h-[90vh] overflow-auto scrollbar-none;
+  }
+  .header {
+    @apply flex  bg-blue-100 text-zinc-950 items-center justify-between px-6 py-4 border-b border-zinc-50;
+  }
+}

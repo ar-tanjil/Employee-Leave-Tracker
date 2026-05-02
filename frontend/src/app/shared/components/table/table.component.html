@@ -1,0 +1,244 @@
+<!-- ── Toolbar ── -->
+<div class="flex items-center justify-between mb-3 gap-4 flex-wrap">
+  <p class="text-xs text-slate-400 tabular-nums">
+    @if (page()().total > 0) {
+      Showing
+      <span class="font-medium text-slate-600"
+        >{{ rangeStart() }}–{{ rangeEnd() }}</span
+      >
+      of
+      <span class="font-medium text-slate-600">{{ page()().total }}</span>
+      results
+    } @else {
+      No results
+    }
+  </p>
+
+  <div class="flex items-center gap-2">
+    <span class="text-xs text-slate-400">Rows per page</span>
+    <select
+      [ngModel]="query().page.pageSize"
+      (ngModelChange)="onPageSizeChange($event)"
+      class="text-xs border border-slate-200 rounded-lg px-2 py-1.5 text-slate-600 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-300"
+    >
+      @for (s of pageSizes(); track s) {
+        <option [value]="s">{{ s }}</option>
+      }
+    </select>
+  </div>
+</div>
+
+<!-- ── Table card ── -->
+<div
+  class="w-full overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-sm"
+>
+  <table class="w-full text-sm border-collapse">
+    <!-- Header -->
+    <thead>
+      <tr class="bg-slate-50 border-b border-slate-200">
+        @for (col of columns(); track col.key) {
+          <th
+            class="px-5 py-3.5 text-[11px]  text-center font-semibold uppercase tracking-wider text-slate-400 whitespace-nowrap select-none"
+            [class]="col.headerClass ?? ''"
+            [class.cursor-pointer]="col.sortable"
+            [class.hover:text-slate-600]="col.sortable"
+            (click)="col.sortable && onSort(col.key)"
+          >
+            <span class="inline-flex items-center gap-1.5">
+              {{ col.label }}
+              @if (col.sortable) {
+                <span class="flex flex-col gap-px leading-none">
+                  <svg
+                    width="8"
+                    height="5"
+                    viewBox="0 0 8 5"
+                    fill="none"
+                    [class.text-indigo-500]="isSortActive(col.key, 'asc')"
+                    [class.text-slate-300]="!isSortActive(col.key, 'asc')"
+                  >
+                    <path d="M4 0L8 5H0L4 0Z" fill="currentColor" />
+                  </svg>
+                  <svg
+                    width="8"
+                    height="5"
+                    viewBox="0 0 8 5"
+                    fill="none"
+                    [class.text-indigo-500]="isSortActive(col.key, 'desc')"
+                    [class.text-slate-300]="!isSortActive(col.key, 'desc')"
+                  >
+                    <path d="M4 5L0 0H8L4 5Z" fill="currentColor" />
+                  </svg>
+                </span>
+              }
+            </span>
+          </th>
+        }
+
+        @if (actionsTemplate()) {
+          <th
+            class="px-5 py-3.5 text-center text-[11px] font-semibold uppercase tracking-wider text-slate-400 whitespace-nowrap"
+          >
+            Actions
+          </th>
+        }
+      </tr>
+    </thead>
+
+    <!-- Body -->
+    <tbody>
+      <!-- Loading skeleton -->
+      @if (loading()) {
+        @for (s of skeletonRows(); track s) {
+          <tr class="border-b border-slate-100 last:border-0 animate-pulse">
+            @for (col of columns(); track col.key) {
+              <td class="px-5 py-3.5">
+                <div class="h-3.5 bg-slate-100 rounded-full w-3/4"></div>
+              </td>
+            }
+            @if (actionsTemplate()) {
+              <td class="px-5 py-3.5">
+                <div class="h-3.5 bg-slate-100 rounded-full w-20 ml-auto"></div>
+              </td>
+            }
+          </tr>
+        }
+      }
+
+      <!-- Empty state -->
+      @if (!loading() && page()().data.length === 0) {
+        <tr>
+          <td
+            [attr.colspan]="columns().length + (actionsTemplate() ? 1 : 0)"
+            class="px-5 py-16 text-center"
+          >
+            <div class="flex flex-col items-center gap-2">
+              <svg
+                class="w-8 h-8 text-slate-200"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.5"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M3.75 9.776c.112-.017.227-.026.344-.026h15.812c.117 0
+                             .232.009.344.026m-16.5 0a2.25 2.25 0 00-1.883
+                             2.542l.857 6a2.25 2.25 0 002.227 1.932H19.05a2.25
+                             2.25 0 002.227-1.932l.857-6a2.25 2.25 0
+                             00-1.883-2.542m-16.5 0V6A2.25 2.25 0 016 3.75h3.879
+                             a1.5 1.5 0 011.06.44l2.122 2.12a1.5 1.5 0
+                             001.06.44H18A2.25 2.25 0 0120.25 9v.776"
+                />
+              </svg>
+              <p class="text-sm text-slate-400">No records found</p>
+            </div>
+          </td>
+        </tr>
+      }
+
+      <!-- Data rows -->
+      @if (!loading()) {
+        @for (row of page()().data; track $index; let odd = $odd) {
+          <tr
+            class="border-b border-slate-100 text-center last:border-0 transition-colors duration-100"
+            [class.bg-white]="!odd"
+            [class.bg-slate-50/40]="odd"
+            [class.hover:bg-indigo-50/50]="true"
+          >
+            @for (col of columns(); track col.key) {
+              <td
+                class="px-5 py-3.5 text-slate-700 whitespace-nowrap"
+                [class]="col.class ?? ''"
+              >
+                {{ row[col.key] }}
+              </td>
+            }
+
+            @if (actionsTemplate()) {
+              <td class="px-5 py-3 text-center">
+                <div class="flex items-center justify-center gap-3">
+                  <ng-container
+                    *ngTemplateOutlet="
+                      actionsTemplate();
+                      context: { $implicit: row }
+                    "
+                  />
+                </div>
+              </td>
+            }
+          </tr>
+        }
+      }
+    </tbody>
+  </table>
+</div>
+
+<!-- ── Pagination ── -->
+<div class="flex items-center justify-between mt-4 gap-4 flex-wrap">
+  <!-- Page info -->
+  <p class="text-xs text-slate-400 tabular-nums">
+    Page
+    <span class="font-medium text-slate-600">{{ query().page.page }}</span> of
+    <span class="font-medium text-slate-600">{{ totalPages() }}</span>
+  </p>
+
+  <!-- Page buttons -->
+  <div class="flex items-center gap-1">
+    <!-- First -->
+    <button
+      (click)="goToPage(1)"
+      [disabled]="query().page.page === 1 || loading"
+      class="pager-btn"
+      title="First page"
+    >
+      «
+    </button>
+
+    <!-- Prev -->
+    <button
+      (click)="goToPage(query().page.page - 1)"
+      [disabled]="query().page.page === 1 || loading"
+      class="pager-btn"
+      title="Previous page"
+    >
+      ‹
+    </button>
+
+    <!-- Page numbers -->
+    @for (p of pageNumbers(); track p) {
+      @if (p === -1) {
+        <span class="px-2 text-slate-300 text-sm select-none">…</span>
+      } @else {
+        <button
+          (click)="goToPage(p)"
+          [disabled]="loading()"
+          class="pager-btn"
+          [class.pager-active]="p === query().page.page"
+        >
+          {{ p }}
+        </button>
+      }
+    }
+
+    <!-- Next -->
+    <button
+      (click)="goToPage(query().page.page + 1)"
+      [disabled]="query().page.page === totalPages() || loading"
+      class="pager-btn"
+      title="Next page"
+    >
+      ›
+    </button>
+
+    <!-- Last -->
+    <button
+      (click)="goToPage(totalPages())"
+      [disabled]="query().page.page === totalPages() || loading"
+      class="pager-btn"
+      title="Last page"
+    >
+      »
+    </button>
+  </div>
+</div>

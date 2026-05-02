@@ -1,5 +1,19 @@
+<!-- Navbar -->
+<app-navbar />
+<!-- Page Title -->
+<div class="mb-6 mt-3 px-4">
+  <div class="flex items-center justify-between">
+    <h1 class="text-2xl font-bold tracking-tight text-zinc-900">
+      {{ currentPageTitle() }}
+    </h1>
+  </div>
 
-<app-navbar/>
+  <!-- Divider line -->
+  <div class="mt-3 border-b border-zinc-200"></div>
+</div>
 
-<h1> {{currentPageTitle()}} </h1>
-<router-outlet/>
+<!-- Main Content -->
+<div class="mb-6 mt-1 px-4">
+  <!-- Router Outlet -->
+  <router-outlet />
+</div>
