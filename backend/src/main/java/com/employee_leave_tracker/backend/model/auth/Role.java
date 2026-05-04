@@ -6,6 +6,9 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+import java.util.Set;
+
 @Data
 @Builder
 @NoArgsConstructor
@@ -26,4 +29,7 @@ public class Role {
 
     @Column(name = "is_system_role", nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE")
     private Boolean isSystemRole;
+
+    @OneToMany(mappedBy = "role", fetch = FetchType.LAZY)
+    private List<RolePermission> rolePermissions;
 }

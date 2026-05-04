@@ -15,6 +15,7 @@ public interface UserAccountRepository extends JpaRepository<UserAccount, Long> 
 
     boolean existsByEmployeeId(Long employeeId);
 
+    @EntityGraph(attributePaths = "userRoles")
     Optional<UserAccount> findByEmployeeId(Long id);
 
     @Query("""

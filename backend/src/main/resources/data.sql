@@ -34,11 +34,11 @@ VALUES (11, 'PAYROLL', 'EDIT', 'Can modify salary and bonuses');
 INSERT INTO role (id, name, description, is_system_role)
 VALUES (1, 'SYSTEM_ADMIN', 'Full system access', true);
 INSERT INTO role (id, name, description, is_system_role)
-VALUES (2, 'HR_ADMIN', 'Manage employees and departments', true);
+VALUES (2, 'HR_ADMIN', 'Manage employees and departments', false);
 INSERT INTO role (id, name, description, is_system_role)
 VALUES (3, 'MANAGER', 'Manage team assignments and view reports', false);
 INSERT INTO role (id, name, description, is_system_role)
-VALUES (4, 'EMPLOYEE', 'Self-service access only', true);
+VALUES (4, 'EMPLOYEE', 'Self-service access only', false);
 
 
 -- ROLE PERMISSION MAP
