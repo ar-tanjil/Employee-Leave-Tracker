@@ -1,8 +1,4 @@
-import {
-  HttpInterceptorFn,
-  HttpResponse,
-  HttpErrorResponse
-} from '@angular/common/http';
+import { HttpInterceptorFn, HttpResponse, HttpErrorResponse } from '@angular/common/http';
 import { inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { HotToastService } from '@ngxpert/hot-toast';
@@ -20,7 +16,6 @@ export const httpInterceptor: HttpInterceptorFn = (req, next) => {
   loadingService.show();
 
   return next(req).pipe(
-
     tap((event) => {
       if (event instanceof HttpResponse && isModifyRequest) {
         const body = event.body as ApiResponse<any>;
@@ -40,10 +35,9 @@ export const httpInterceptor: HttpInterceptorFn = (req, next) => {
 
       return throwError(() => apiError);
     }),
-    finalize(() => loadingService.hide())
+    finalize(() => loadingService.hide()),
   );
 };
-
 
 function mapApiError(error: HttpErrorResponse): ApiError {
   return {
@@ -54,14 +48,12 @@ function mapApiError(error: HttpErrorResponse): ApiError {
   };
 }
 
-
 function handleUnauthorized(router: Router, toast: HotToastService) {
   toast.error('Session expired. Please login again.');
   // optional: clear tokens
   localStorage.removeItem('token');
   router.navigate(['/login']);
 }
-
 
 // Helper function to extract error message
 function extractMessage(error: HttpErrorResponse): string {

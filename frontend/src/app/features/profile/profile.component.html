@@ -1,1 +1,40 @@
-<p>profile.component works!</p>
+<div class="flex items-center justify-center p-4">
+  <!-- Employee Card -->
+  <div class="max-w-xl w-full overflow-hidden">
+
+    <!-- Header/Identity -->
+    <div class="p-6 flex items-start gap-5">
+      <img [src]="employee()?.avatarUrl" alt="Employee Portrait" class="w-40 h-40 rounded-lg object-cover bg-slate-100" />
+      <div class="flex-1">
+        <h2 class="text-xl font-bold text-slate-900">{{ employee()?.firstName }} {{ employee()?.lastName }}</h2>
+        <p class="text-sm font-medium text-indigo-600">{{ employee()?.designationName }}</p>
+        <p class="text-xs text-slate-500 mt-1 uppercase tracking-wider font-semibold">EMP-{{ employee()?.id }}</p>
+        <a [href]="'mailto:' + employee()?.email"
+          class="w-full block hover:text-blue-800 text-blue-950 text-sm font-semibold py-2.5 rounded-lg transition-colors">
+         {{ employee()?.email }}
+        </a>
+      </div>
+    </div>
+
+    <!-- Details Grid -->
+    <div class="px-6 py-4 bg-slate-50/50 border-y border-slate-100 grid grid-cols-2 gap-4">
+      <div>
+        <span class="block text-[10px] uppercase font-bold text-slate-400">Department</span>
+        <span class="text-sm font-medium text-slate-700">{{ employee()?.departmentName }}</span>
+      </div>
+      <div>
+        <span class="block text-[10px] uppercase font-bold text-slate-400">Manager</span>
+        <span class="text-sm font-medium text-slate-700">{{ employee()?.managerName }}</span>
+      </div>
+      <div>
+        <span class="block text-[10px] uppercase font-bold text-slate-400">Location</span>
+        <span class="text-sm font-medium text-slate-700">{{ employee()?.location }}</span>
+      </div>
+      <div>
+        <span class="block text-[10px] uppercase font-bold text-slate-400">Joined</span>
+        <span class="text-sm font-medium text-slate-700">{{ employee()?.hireDate | date:'MMMM yyyy' }}</span>
+      </div>
+    </div>
+
+  </div>
+</div>

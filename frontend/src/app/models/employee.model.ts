@@ -34,6 +34,8 @@ export type EmployeeRes = {
   managerName?: null;
   hireDate?: Date;
   employmentType?: string;
+  avatarUrl?: string;
+  location?: string;
 }
 
 

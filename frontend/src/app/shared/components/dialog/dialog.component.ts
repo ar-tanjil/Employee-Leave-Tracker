@@ -14,6 +14,8 @@ export class DialogComponent {
 
   // input
   readonly title = input.required<string>();
+  readonly sizeClass = input<string>('xl:max-w-5xl max-w-3xl');
+  readonly closeOnBackdrop = input<boolean>(false);
 
   // output
   readonly close = output<void>();
@@ -22,7 +24,7 @@ export class DialogComponent {
   readonly loading = computed(() => this.loadingService.isLoading());
 
   onBackdropClick(event: MouseEvent): void {
-    if ((event.target as HTMLElement) === event.currentTarget) {
+    if ((event.target as HTMLElement) === event.currentTarget && this.closeOnBackdrop()) {
       this.close.emit();
     }
   }

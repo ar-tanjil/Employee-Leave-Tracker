@@ -1,7 +1,7 @@
 import { Component, computed, HostListener, inject, signal } from '@angular/core';
 import { NavigationEnd, Router, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { environment } from '../../../environments/environment';
-import { NavbarComponent } from "../../shared/components/navbar/navbar.component";
+import { NavbarComponent } from "../../core/navbar/navbar.component";
 import { filter } from 'rxjs';
 
 @Component({

@@ -43,6 +43,13 @@ export const routes: Routes = [
           ),
       },
       {
+        path: 'leave/approver',
+        loadComponent: () =>
+          import('./features/leave/leave-approver/leave-approver.component').then(
+            (m) => m.LeaveApproverComponent,
+          ),
+      },
+      {
         path: 'profile',
         loadComponent: () =>
           import('./features/profile/profile.component').then(

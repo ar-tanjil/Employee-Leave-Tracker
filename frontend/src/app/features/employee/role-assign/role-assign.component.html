@@ -1,0 +1,58 @@
+@if (dataLoader()) {
+
+
+<app-dialog title="Assign Roles" (close)="cancel()" sizeClass="max-w-md" [closeOnBackdrop]="true">
+  <div class="mx-auto p-4">
+    <div class="mb-5">
+      <p class="text-md text-zinc-950">Employee Name:
+        <span class="font-mono font-bold text-blue-600">{{ employeeInfo().name }}</span>
+      </p>
+      <p class="text-md text-zinc-950">Employee Code:
+        <span class="font-mono font-bold text-blue-600">{{ employeeInfo().code }}</span>
+      </p>
+    </div>
+
+    <div class="space-y-2 mb-6">
+      @for (role of allRoles(); track role.id) {
+      <label class="flex items-center p-3 border-2 rounded-xl cursor-pointer transition-all duration-200"
+        [class.border-blue-500]="selectedRoleIds().has(role.id)" [class.bg-blue-50]="selectedRoleIds().has(role.id)">
+
+        <input type="checkbox" [checked]="selectedRoleIds().has(role.id)" (change)="toggleRole(role.id)"
+          class="w-5 h-5 rounded text-blue-600 focus:ring-blue-500 border-gray-300" />
+
+        <span class="ml-3 text-sm font-semibold text-gray-700">
+          {{ role.name }}
+        </span>
+
+        @if (selectedRoleIds().has(role.id)) {
+        <span class="ml-auto text-blue-600">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd"
+              d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+              clip-rule="evenodd" />
+          </svg>
+        </span>
+        }
+      </label>
+      } @empty {
+      <p class="text-center text-gray-400 py-4">No roles available to assign.</p>
+      }
+    </div>
+
+    <!-- Show button only if roles are selected -->
+
+    @if (selectedRoleIds().size === 0) {
+    <p class="text-center text-gray-400 py-1">Select at least one role to assign.</p>
+    } @else {
+    <p class="text-center text-green-500 py-1"> {{ selectedRoleIds().size }} role(s) selected.</p>
+    }
+
+    <div class="flex justify-end pt-2">
+      <button (click)="assignRoles()" [disabled]="selectedRoleIds().size === 0" class="btn-primary">
+        Assign Role
+      </button>
+    </div>
+
+  </div>
+</app-dialog>
+}

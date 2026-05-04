@@ -3,7 +3,7 @@
 
     <div class="flex items-center justify-between">
       <div>
-        <h1 class="text-2xl font-bold text-slate-900 tracking-tight">Employee List</h1>
+        <h1 class="text-xl font-bold text-slate-900 tracking-tight">Employee List</h1>
         <p class="text-sm text-zinc-500 mt-0.5">
           Manage employee information and details.
         </p>
@@ -13,18 +13,22 @@
       </button>
     </div>
 
-    <!-- Dynamic table -->
-    <app-table [columns]="columnsDef" [page]="page" [loading]="loading()" [initialPageSize]="10"
-      [pageSizes]="[5, 10, 25, 50]" (queryChange)="onQueryChange($event)">
+    <!-- Employee table -->
+    <app-table [columns]="columnsDef" [pageData]="pageData" [loading]="loading()" (queryChange)="onQueryChange($event)">
+
+      <!-- Custom cell templates can be defined here -->
+      <ng-template appCell="firstName" let-row>
+        <strong>{{ row.firstName }} {{ row.lastName }}</strong>
+      </ng-template>
+
       <!--
         Action column — parent fully owns the buttons.
-        `let-row` is typed as EmployeeTable.
-        Buttons are conditional: Delete only for active users.
       -->
       <ng-template #actions let-row>
         <button (click)="openViewDetails(row.id)" class="viewBtn">View</button>
+        <button (click)="openAsignRole(row.id)" class="editBtn">Asign Role</button>
         <button (click)="openForm(row.id)" class="editBtn">Edit</button>
-        @if(canDelete) {
+        @if(hasDeletePermission) {
         <button (click)="confirmDelete(row)"
           class=" cursor-pointer inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-medium bg-red-50 text-red-600 hover:bg-red-100 transition-colors">
           Delete
@@ -42,6 +46,17 @@
 }
 
 <!-- Employee View Modal -->
-@if (showView()) {
+<!-- @if (showView()) {
 <app-employee-view (onClose)="showView.set(false)" [employee]="employee()!" />
+} -->
+
+@if (showView()) {
+ <app-dialog title="Employee Details" (close)="showView.set(false)" sizeClass="max-w-md md:max-w-2xl" [closeOnBackdrop]="true">
+   <app-profile [employeeId]="selectedEmployeeId()!" />
+  </app-dialog>
+}
+
+<!-- Employee Asign Role Modal -->
+@if (showAsignRole()) {
+<app-role-assign (onCompleted)="onAsigned()" [employeeId]= "selectedEmployeeId()!" (onCancelled)="showAsignRole.set(false)" />
 }

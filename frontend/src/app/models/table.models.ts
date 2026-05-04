@@ -5,15 +5,20 @@ export interface SortState {
   dir: SortDir;
 }
 
-export interface PageState {
-  page: number; // 1-based
-  pageSize: number;
-}
+// export interface PageState {
+//   page: number; // 1-based
+//   pageSize: number;
+// }
 
-/** Emitted on every sort / page change */
+// /** Emitted on every sort / page change */
+// export interface TableQueryEvent {
+//   sort: SortState | null;
+//   page: PageState;
+// }
+
 export interface TableQueryEvent {
-  sort: SortState | null;
-  page: PageState;
+  sort: { key: string; dir: 'asc' | 'desc' } | null;
+  page: { page: number; pageSize: number };
 }
 
 /** Column definition supplied by the parent */
