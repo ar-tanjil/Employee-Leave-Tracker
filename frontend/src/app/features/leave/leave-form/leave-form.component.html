@@ -1,86 +1,95 @@
-<app-dialog title="Apply Leave" (close)="onCancelled.emit()">
-  <div class="mx-auto p-2 bg-white border border-gray-200">
-    <form [formGroup]="leaveForm" (ngSubmit)="onSubmit()" class="space-y-6">
+<app-dialog title="Apply Leave" (close)="onCancelled.emit()" sizeClass="max-w-xl">
+  <div class="mx-auto p-2 px-4 bg-white border border-gray-200">
+    <form [formGroup]="leaveForm" (ngSubmit)="onSubmit()" class="space-y-4">
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
         <!-- Start Date -->
         <div>
           <label class="block text-sm font-medium text-gray-700">Start Date</label>
-          <input
-            type="date"
-            formControlName="startDate"
-            class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-          />
+          <input type="date" formControlName="startDate"
+            class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" />
 
           @if (isInvalid('startDate')) {
-            <p class="text-red-400 text-xs mt-1">
-              {{ leaveForm.get('startDate')?.errors | errorMessage: 'Start Date' }}
-            </p>
+          <p class="text-red-400 text-xs mt-1">
+            {{ leaveForm.get('startDate')?.errors | errorMessage: 'Start Date' }}
+          </p>
           }
 
           @if (leaveForm.touched && leaveForm.errors) {
-            <p class="text-red-400 text-xs mt-1">
-              {{ leaveForm.errors | errorMessage }}
-            </p>
+          <p class="text-red-400 text-xs mt-1">
+            {{ leaveForm.errors | errorMessage }}
+          </p>
           }
         </div>
 
         <!-- End Date -->
         <div>
           <label class="block text-sm font-medium text-gray-700">End Date</label>
-          <input
-            type="date"
-            formControlName="endDate"
-            class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-          />
+          <input type="date" formControlName="endDate"
+            class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" />
 
           @if (isInvalid('endDate')) {
-            <p class="text-red-400 text-xs mt-1">
-              {{ leaveForm.get('endDate')?.errors | errorMessage: 'End Date' }}
-            </p>
+          <p class="text-red-400 text-xs mt-1">
+            {{ leaveForm.get('endDate')?.errors | errorMessage: 'End Date' }}
+          </p>
           }
 
           @if (leaveForm.touched && leaveForm.errors) {
-            <p class="text-red-400 text-xs mt-1">
-              {{ leaveForm.errors | errorMessage }}
-            </p>
+          <p class="text-red-400 text-xs mt-1">
+            {{ leaveForm.errors | errorMessage }}
+          </p>
+          }
+        </div>
+
+        <!-- Leave Type -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700">Leave Type</label>
+          <select formControlName="leaveTypeId"
+            class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+            <option [value]="null" disabled>Select leave type...</option>
+            @for (data of leaveType(); track $index) {
+            <option [value]="data.id">
+              {{ data.name?.padEnd(15) }}
+              (Used: {{ data.usedDays }} of {{ data.allocatedDays }} days)
+            </option>
+            }
+          </select>
+
+          @if (isInvalid('leaveTypeId')) {
+          <p class="text-red-400 text-xs mt-1">
+            {{ leaveForm.get('leaveTypeId')?.errors | errorMessage: 'Leave Type' }}
+          </p>
           }
         </div>
 
         <!-- Leave Duration -->
         <div>
           <label class="block text-sm font-medium text-gray-700">Leave Duration</label>
-          <select
-            formControlName="duration"
-            class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-          >
+          <select formControlName="duration"
+            class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
             @for (data of leaveDurationType; track $index) {
-              <option [value]="data.key">{{ data.value }}</option>
+            <option [value]="data.key">{{ data.value }}</option>
             }
           </select>
 
           @if (isInvalid('duration')) {
-            <p class="text-red-400 text-xs mt-1">
-              {{ leaveForm.get('duration')?.errors | errorMessage: 'Start Date' }}
-            </p>
+          <p class="text-red-400 text-xs mt-1">
+            {{ leaveForm.get('duration')?.errors | errorMessage: 'Leave Duration' }}
+          </p>
           }
         </div>
 
         <!-- Reason -->
-        <div>
+        <div class="md:col-span-2">
           <label class="block text-sm font-medium text-gray-700">Reason for Leave</label>
-          <textarea
-            formControlName="reason"
-            rows="4"
-            placeholder="Please provide a brief reason..."
-            class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm resize-none"
-          >
+          <textarea formControlName="reason" rows="4" placeholder="Please provide a brief reason..."
+            class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm resize-none">
           </textarea>
 
           <!-- Error Messages -->
           @if (isInvalid('reason')) {
-               <p class="text-red-400 text-xs mt-1">
-              {{ leaveForm.get('reason')?.errors | errorMessage: 'Reason for Leave' }}
-            </p>
+          <p class="text-red-400 text-xs mt-1">
+            {{ leaveForm.get('reason')?.errors | errorMessage: 'Reason for Leave' }}
+          </p>
           }
 
           <!-- Character Counter (Optional but helpful) -->
@@ -92,18 +101,12 @@
 
       <!-- Submit Button -->
       <div class="flex justify-end pt-4">
-        <button
-          type="button"
-          (click)="leaveForm.reset()"
-          class="mr-4 bg-white py-2 cursor-pointer px-4 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none"
-        >
+        <button type="button" (click)="leaveForm.reset()"
+          class="mr-4 bg-white py-2 cursor-pointer px-4 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none">
           Clear
         </button>
-        <button
-          type="submit"
-          [disabled]="leaveForm.invalid"
-          class="inline-flex cursor-pointer justify-center py-2 px-6 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:bg-gray-400"
-        >
+        <button type="submit" [disabled]="leaveForm.invalid"
+          class="inline-flex cursor-pointer justify-center py-2 px-6 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:bg-gray-400">
           Apply
         </button>
       </div>

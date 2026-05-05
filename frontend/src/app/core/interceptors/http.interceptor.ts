@@ -10,6 +10,7 @@ import { LoadingService } from '../services/loading.service';
 export const httpInterceptor: HttpInterceptorFn = (req, next) => {
   const toast = inject(HotToastService);
   const loadingService = inject(LoadingService);
+  const router = inject(Router);
 
   const isModifyRequest = ['POST', 'PUT', 'PATCH', 'DELETE'].includes(req.method);
 
@@ -25,8 +26,8 @@ export const httpInterceptor: HttpInterceptorFn = (req, next) => {
 
     catchError((error: HttpErrorResponse) => {
       const apiError = mapApiError(error);
-      if (error.status === 403) {
-        toast.error('You do not have permission to perform this action');
+      if (error.status === 401) {
+        handleUnauthorized(router, toast);
       } else {
         toast.error(apiError.message);
       }
@@ -49,9 +50,9 @@ function mapApiError(error: HttpErrorResponse): ApiError {
 }
 
 function handleUnauthorized(router: Router, toast: HotToastService) {
-  toast.error('Session expired. Please login again.');
+  toast.error('Invalid credential. Please login again.');
   // optional: clear tokens
-  localStorage.removeItem('token');
+  localStorage.clear();
   router.navigate(['/login']);
 }
 

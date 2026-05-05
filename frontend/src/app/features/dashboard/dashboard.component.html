@@ -1,1 +1,44 @@
-<h1>Dashboard</h1>
+<!-- Header -->
+<div class="flex justify-between items-center px-6 py-4 bg-white shadow-sm">
+  <h1 class="text-xl font-semibold text-gray-700">
+    Employee Dashboard
+  </h1>
+
+  <div class="text-sm text-gray-500">
+    {{ currentDate() }}
+  </div>
+</div>
+
+@if( !isLoading() ) {
+<!-- Body -->
+<div class="p-6">
+
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+    <!-- Total Employees -->
+    <div class="bg-white rounded-2xl shadow p-5 border-l-4 border-blue-500">
+      <p class="text-gray-500 text-sm">Total Employees</p>
+      <h2 class="text-3xl font-bold text-gray-800 mt-2">
+        {{ dashboard().totalEmployees }}
+      </h2>
+    </div>
+
+    <!-- On Leave -->
+    <div class="bg-white rounded-2xl shadow p-5 border-l-4 border-red-400">
+      <p class="text-gray-500 text-sm">On Leave</p>
+      <h2 class="text-3xl font-bold text-gray-800 mt-2">
+        {{ dashboard().employeesOnLeave }}
+      </h2>
+    </div>
+
+    <!-- Attended -->
+    <div class="bg-white rounded-2xl shadow p-5 border-l-4 border-green-500">
+      <p class="text-gray-500 text-sm">Attended Today</p>
+      <h2 class="text-3xl font-bold text-gray-800 mt-2">
+        {{ dashboard().employeeAttendance }}
+      </h2>
+    </div>
+
+  </div>
+</div>
+}

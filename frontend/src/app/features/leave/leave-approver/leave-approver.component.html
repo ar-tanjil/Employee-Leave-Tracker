@@ -1,1 +1,12 @@
-<p>leave-approver.component works!</p>
+<app-table [columns]="columnsDef" [pageData]="pageData" [loading]="loading()" (queryChange)="onQueryChange($event)">
+
+  <ng-template appCell="startDate" let-row>
+    <strong>{{ row.startDate | date}} - {{ row.endDate | date}}</strong>
+  </ng-template>
+
+  <ng-template #actions let-row>
+    <app-icon (click)="handleLeaveAction(row)" name="edit" appTooltip="Approve Leave" tooltipType="bg-indigo-600"
+      class="text-indigo-600 cursor-pointer bg-indigo-300 hover:bg-indigo-200 p-1.5 rounded" />
+  </ng-template>
+
+</app-table>

@@ -1,8 +1,8 @@
 import { Component, HostListener, inject, signal } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
-import { environment } from '../../../environments/environment';
 import Swal from 'sweetalert2';
-import { AuthService } from '../services/auth.service';
+import { AuthService } from '../../services/auth.service';
+import { environment } from '../../../../environments/environment';
 @Component({
   selector: 'app-navbar',
   imports: [RouterLinkActive, RouterLink],
@@ -12,7 +12,7 @@ import { AuthService } from '../services/auth.service';
 export class NavbarComponent {
   private readonly authService = inject(AuthService);
 
-  readonly applicationName = environment.appName || 'Employee Leave Tracker';
+  readonly applicationName = environment.appName || 'Leave Tracker';
 
   isMenuOpen = signal(false);
 

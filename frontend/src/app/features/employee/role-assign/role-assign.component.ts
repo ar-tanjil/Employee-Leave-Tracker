@@ -22,7 +22,7 @@ export class RoleAssignComponent {
   // input & output
   readonly employeeId = input.required<number>();
   readonly onCompleted = output<void>();
-  readonly onCancelled = output<void>();
+   readonly onClose = output<void>();
 
   // data fetching
   private readonly _employeeId$ = toObservable(this.employeeId);
@@ -47,6 +47,11 @@ export class RoleAssignComponent {
   readonly selectedRoleIds = linkedSignal({
     source: this.roleData,
     computation: (data) => new Set(data?.employeeRoles.map(r => r.id) ?? [])
+  });
+
+  readonly selectedRoleName = linkedSignal({
+   source: this.roleData,
+    computation: (data) => data?.employeeRoles.map(r => r.name).join(', ') ?? ''
   });
 
   // derived state
@@ -79,10 +84,6 @@ export class RoleAssignComponent {
       next: () => this.onCompleted.emit(),
       error: (err) => console.error('Save failed', err)
     });
-  }
-
-  cancel(): void {
-    this.onCancelled.emit();
   }
 
 }

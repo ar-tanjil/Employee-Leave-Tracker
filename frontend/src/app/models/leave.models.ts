@@ -16,17 +16,31 @@ export type LeaveTable = {
   id: number;
   startDate: string;
   endDate: string;
-  duration: LeaveDuration;
+  leaveTypeName: string;
+  totalDays: number;
   status: string;
 };
 
 export type LeaveApproverTable = {
-  leaveId: number;
-  referenceId: number;
-  employeeName: string;
-  startDate: string;
-  endDate: string;
-  applyDate: string;
-  duration: number;
-  status: string;
+  referenceId?: number;
+  leaveId?: number;
+  employeeName?: string;
+  leaveTypeName?: string;
+  startDate?: Date;
+  endDate?: Date;
+  leaveDuration?: string;
+  totalDays?: number;
+  status?: string;
+  reason?: string;
 };
+
+export type LeaveTypeRes = {
+  id?: number;
+  name?: string;
+  allocatedDays?: number;
+  usedDays?: number;
+}
+
+
+
+

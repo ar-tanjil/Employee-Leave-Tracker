@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, output, signal } from '@angular/core';
+import { Component, computed, inject, OnInit, output, signal } from '@angular/core';
 import { LeaveService } from '../leave.service';
 import {
   AbstractControl,
@@ -12,6 +12,8 @@ import { LeaveReq, LeaveDuration } from '../../../models/leave.models';
 import { DialogComponent } from '../../../shared/components/dialog/dialog.component';
 import { ValidationErrorMessagePipe } from '../../../shared/pipe/validation-error-message.pipe';
 import { CharCountPipe } from '../../../shared/pipe/char-count.pipe';
+import { catchError, forkJoin, of } from 'rxjs';
+import { toSignal } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-leave-form',
@@ -24,13 +26,30 @@ export class LeaveFormComponent implements OnInit {
   private readonly fb = inject(FormBuilder);
   protected readonly leaveService = inject(LeaveService);
 
-  // output
+  // input & output
   readonly onSaved = output<void>();
   readonly onCancelled = output<void>();
 
   // form data
-  isSaving = signal(false);
   leaveForm!: FormGroup;
+
+  // data fetching
+  private readonly data$ = forkJoin({
+    leaveType: this.leaveService.getLeaveTypes()
+    })
+    .pipe(
+      catchError((error) => {
+        console.error('API Error:', error);
+        return of(null);
+      })
+    );
+  readonly data = toSignal(this.data$, {initialValue: undefined});
+
+  // derived state
+  readonly leaveType = computed(() => this.data()?.leaveType);
+  readonly isLoading = computed(() => this.data() === undefined)
+
+
 
   ngOnInit(): void {
     this.initForm();
@@ -41,6 +60,7 @@ export class LeaveFormComponent implements OnInit {
       {
         startDate: [null, [Validators.required]],
         endDate: [null, [Validators.required]],
+        leaveTypeId: [null, [Validators.required]],
         duration: [LeaveDuration.FULL_DAY, [Validators.required]],
         reason: ['', [Validators.required, Validators.maxLength(255)]],
       },
@@ -60,18 +80,14 @@ export class LeaveFormComponent implements OnInit {
       this.leaveForm.markAllAsTouched();
       return;
     }
-
-    this.isSaving.set(true);
     const formValue = this.leaveForm.getRawValue();
 
     this.leaveService.saveLeave(formValue as LeaveReq).subscribe({
       next: () => {
-        this.isSaving.set(false);
         this.onSaved.emit();
       },
       error: () => {
         // Error interceptor already showed the toast
-        this.isSaving.set(false);
       },
     });
   }

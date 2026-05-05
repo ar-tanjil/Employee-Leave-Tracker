@@ -1,14 +1,15 @@
 @if (dataLoader()) {
-
-
-<app-dialog title="Assign Roles" (close)="cancel()" sizeClass="max-w-md" [closeOnBackdrop]="true">
+<app-dialog title="Assign Roles" (close)="onClose.emit()" sizeClass="max-w-md" [closeOnBackdrop]="true">
   <div class="mx-auto p-4">
     <div class="mb-5">
-      <p class="text-md text-zinc-950">Employee Name:
+      <p class="text-md font-mono text-zinc-950">Employee Name:
         <span class="font-mono font-bold text-blue-600">{{ employeeInfo().name }}</span>
       </p>
-      <p class="text-md text-zinc-950">Employee Code:
+      <p class="text-md font-mono text-zinc-950">Employee Code:
         <span class="font-mono font-bold text-blue-600">{{ employeeInfo().code }}</span>
+      </p>
+       <p class="text-sm font-mono text-zinc-950">Current Role:
+        <span class="font-mono font-bold text-blue-600">{{ selectedRoleName() }}</span>
       </p>
     </div>
 

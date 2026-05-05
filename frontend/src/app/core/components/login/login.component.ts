@@ -1,6 +1,5 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { AUTH_STORAGE_KEY, AuthService } from '../../../../core/services/auth.service';
 import { CommonModule } from '@angular/common';
 import {
   AbstractControl,
@@ -9,8 +8,10 @@ import {
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
-import { UserLogin } from '../../../../models/auth.model';
-import { environment } from '../../../../../environments/environment';
+import { environment } from '../../../../environments/environment';
+import { AuthService } from '../../services/auth.service';
+import { UserLogin } from '../../../models/auth.model';
+
 
 @Component({
   selector: 'ims-login',

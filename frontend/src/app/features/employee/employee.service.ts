@@ -9,14 +9,6 @@ export class EmployeeService {
 
   private api = inject(ApiService);
 
-  // state
-  private _selectedEmployeeId = signal<number | null>(null);
-  readonly selectedEmployeeId = this._selectedEmployeeId.asReadonly();
-
-  setSelectedEmployee(employee: number | null) {
-    this._selectedEmployeeId.set(employee ? employee : null);
-  }
-
 
   getEmployees(params: PaginationParams) {
     return this.api.getPaged<EmployeeTable>('v1/employees', params);
@@ -27,8 +19,8 @@ export class EmployeeService {
   }
 
 
-  saveAndUpdateEmployee(employee: EmployeeReq) {
-    return this.api.post<{ message: string }, EmployeeReq>('v1/employees', employee);
+  saveAndUpdateEmployee(fomrData: FormData) {
+    return this.api.post<{ message: string }, FormData>('v1/employees', fomrData);
   }
 
   deleteEmployee(id: number) {
@@ -44,7 +36,7 @@ export class EmployeeService {
   }
 
   updateEmployeeRoles(payload: { employeeId: number; roleIds: number[] }) {
-    return this.api.post(`v1/users/roles/assign`, payload);
+    return this.api.post(`v1/users/assign-roles`, payload);
   }
 
 }

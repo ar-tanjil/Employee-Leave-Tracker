@@ -12,12 +12,13 @@ import { TableComponent } from '../../../shared/components/table/table.component
 import { TableCellDirective } from '../../../shared/directives/table-cell.directive';
 import { RoleAssignComponent } from '../role-assign/role-assign.component';
 import { RoleInfo } from '../../../models/auth.model';
-import { DialogComponent } from "../../../shared/components/dialog/dialog.component";
-import { ProfileComponent } from "../../profile/profile.component";
+import { IconComponent } from '../../../shared/components/icon/icon.component';
+import { TooltipDirective } from '../../../shared/directives/tooltip.directive';
 
 @Component({
   selector: 'app-employee-table',
-  imports: [TableComponent, EmployeeFormComponent, TableCellDirective, RoleAssignComponent, DialogComponent, ProfileComponent],
+  imports: [TableComponent, EmployeeFormComponent, TableCellDirective,
+    RoleAssignComponent, EmployeeViewComponent, IconComponent, TooltipDirective],
   templateUrl: './employee-table.component.html',
   styleUrl: './employee-table.component.css',
 })
@@ -54,7 +55,7 @@ export class EmployeeTableComponent {
       if (!isVisible) {
         // Use untracked if you don't want this effect to re-run
         // just because the employee signal changed
-        untracked(() => this.employee.set(null));
+        untracked(() => this.selectedEmployeeId.set(null));
       }
     });
   }
@@ -83,35 +84,24 @@ export class EmployeeTableComponent {
   }
 
   openForm(id: number | null): void {
-    if (!id) {
-      return this.showForm.set(true);
+    if (id) {
+      this.selectedEmployeeId.set(id);
     }
-
-    this.employeeService.getEmployeeById(id!).subscribe({
-      next: (emp) => {
-        this.employee.set(emp);
-        this.showForm.set(true);
-      },
-    });
-  }
-
-  openViewDetails(id: number | null): void {
-    if (!id) return;
-    this.selectedEmployeeId.set(id);
-
-    this.employeeService.getEmployeeById(id!).subscribe({
-      next: (emp) => {
-        this.employee.set(emp);
-        this.showView.set(true);
-      },
-    });
+    return this.showForm.set(true);
   }
 
   onSaved(): void {
     this.onQueryChange({ page: { page: 1, pageSize: 10 }, sort: null });
     this.showForm.set(false);
-    this.employeeService.setSelectedEmployee(null);
+    this.selectedEmployeeId.set(null);
   }
+
+  openViewDetails(id: number | null): void {
+    if (!id) return;
+    this.selectedEmployeeId.set(id);
+    this.showView.set(true);
+  }
+
 
   openAsignRole(id: number | null): void {
     if (!id) {
@@ -123,7 +113,7 @@ export class EmployeeTableComponent {
 
   onAsigned(): void {
     this.showAsignRole.set(false);
-    this.employeeService.setSelectedEmployee(null);
+    this.selectedEmployeeId.set(null);
   }
 
   get hasDeletePermission() {

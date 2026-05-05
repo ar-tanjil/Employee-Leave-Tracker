@@ -18,6 +18,7 @@ export type EmployeeReq = {
   managerId?: number;
   hireDate?: Date;
   employmentType?: string;
+  imageFile?: File
 }
 
 export type EmployeeRes = {
@@ -34,8 +35,8 @@ export type EmployeeRes = {
   managerName?: null;
   hireDate?: Date;
   employmentType?: string;
-  avatarUrl?: string;
-  location?: string;
+  image?: string;
+  address?: string;
 }
 
 

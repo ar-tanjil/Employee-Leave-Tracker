@@ -3,7 +3,7 @@
 
     <div class="flex items-center justify-between">
       <div>
-        <h1 class="text-xl font-bold text-slate-900 tracking-tight">Employee List</h1>
+        <h1 class="text-xl font-semibold text-gray-700">Employee List</h1>
         <p class="text-sm text-zinc-500 mt-0.5">
           Manage employee information and details.
         </p>
@@ -25,14 +25,22 @@
         Action column — parent fully owns the buttons.
       -->
       <ng-template #actions let-row>
-        <button (click)="openViewDetails(row.id)" class="viewBtn">View</button>
-        <button (click)="openAsignRole(row.id)" class="editBtn">Asign Role</button>
-        <button (click)="openForm(row.id)" class="editBtn">Edit</button>
+
+        <!-- View Icon -->
+        <app-icon (click)="openViewDetails(row.id)" name="view" appTooltip="View Employee Details" tooltipType="bg-blue-800"
+          class="text-blue-800 cursor-pointer bg-blue-300 hover:bg-blue-200 p-1.5 rounded" />
+
+        <!-- Edit Icon -->
+        <app-icon (click)="openForm(row.id)" name="edit" appTooltip="Edit Employee" tooltipType="bg-indigo-600"
+          class="text-indigo-600 cursor-pointer bg-indigo-300 hover:bg-indigo-200 p-1.5 rounded" />
+
+          <!-- Assign Role -->
+            <app-icon (click)="openAsignRole(row.id)" name="user" appTooltip="Assign Role" tooltipType="bg-zinc-600"
+          class="text-zinc-100 cursor-pointer bg-zinc-600 hover:bg-zinc-400 p-1.5 rounded" />
         @if(hasDeletePermission) {
-        <button (click)="confirmDelete(row)"
-          class=" cursor-pointer inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-medium bg-red-50 text-red-600 hover:bg-red-100 transition-colors">
-          Delete
-        </button>
+
+        <app-icon (click)="confirmDelete(row)"  name="delete" appTooltip="Delete Employee" tooltipType="bg-red-500"
+          class="text-red-800 cursor-pointer bg-red-300  hover:bg-red-200 p-1.5 rounded" />
         }
       </ng-template>
     </app-table>
@@ -42,21 +50,17 @@
 
 <!-- Employee Form Modal -->
 @if (showForm()) {
-<app-employee-form (onSaved)="onSaved()" [employee]="employee()" (onCancelled)="showForm.set(false)" />
+<app-employee-form (onSaved)="onSaved()" (onClose)="showForm.set(false)" [employeeId]="selectedEmployeeId()" />
 }
 
 <!-- Employee View Modal -->
-<!-- @if (showView()) {
-<app-employee-view (onClose)="showView.set(false)" [employee]="employee()!" />
-} -->
-
 @if (showView()) {
- <app-dialog title="Employee Details" (close)="showView.set(false)" sizeClass="max-w-md md:max-w-2xl" [closeOnBackdrop]="true">
-   <app-profile [employeeId]="selectedEmployeeId()!" />
-  </app-dialog>
+<app-employee-view (onClose)="showView.set(false)" [employeeId]="selectedEmployeeId()!" />
 }
+
 
 <!-- Employee Asign Role Modal -->
 @if (showAsignRole()) {
-<app-role-assign (onCompleted)="onAsigned()" [employeeId]= "selectedEmployeeId()!" (onCancelled)="showAsignRole.set(false)" />
+<app-role-assign (onCompleted)="onAsigned()" [employeeId]="selectedEmployeeId()!"
+  (onClose)="showAsignRole.set(false)" />
 }

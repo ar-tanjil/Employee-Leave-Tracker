@@ -7,10 +7,12 @@ import { ColumnDef, TableQueryEvent } from '../../../models/table.models';
 import { PaginationParams } from '../../../models/api-response.model';
 import { finalize } from 'rxjs';
 import { TableComponent } from '../../../shared/components/table/table.component';
+import { TableCellDirective } from "../../../shared/directives/table-cell.directive";
+import { DatePipe } from '@angular/common';
 
 @Component({
   selector: 'app-leave-table',
-  imports: [LeaveFormComponent, TableComponent],
+  imports: [LeaveFormComponent, TableComponent, TableCellDirective, DatePipe],
   templateUrl: './leave-table.component.html',
   styleUrl: './leave-table.component.css',
 })
@@ -62,18 +64,19 @@ export class LeaveTableComponent {
     }
   }
 
-  onSaved() {}
+  onSaved() {
+    this.onQueryChange({ page: { page: 1, pageSize: 10 }, sort: null });
+    this.showForm.set(false);
+  }
 
   // columns definition
   columnsDef: ColumnDef<LeaveTable>[] = [
     {
       key: 'startDate',
-      label: 'Start Date',
-      sortable: false,
-      class: 'font-medium text-slate-900',
+      label: 'Date',
     },
-    { key: 'endDate', label: 'End Date', sortable: false, class: 'text-slate-500' },
-    { key: 'duration', label: 'Leave Type', sortable: false },
-    { key: 'status', label: 'Status', sortable: false },
+    { key: 'totalDays', label: 'Total Day', sortable: false },
+    { key: 'leaveTypeName', label: 'Leave Type', },
+    { key: 'status', label: 'Status', },
   ];
 }

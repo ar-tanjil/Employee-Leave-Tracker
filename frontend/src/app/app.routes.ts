@@ -67,7 +67,7 @@ export const routes: Routes = [
     children: [
       {
         path: '',
-        loadComponent: () => import('./features/auth/components/login/login.component').then(
+        loadComponent: () => import('./core/components/login/login.component').then(
           (m) => m.LoginComponent,
         ),
       },
