@@ -3,6 +3,7 @@ package com.employee_leave_tracker.backend.serviceImpl;
 import com.employee_leave_tracker.backend.dto.auth.PermissionDTO;
 import com.employee_leave_tracker.backend.dto.auth.RoleAssignReqDTO;
 import com.employee_leave_tracker.backend.dto.auth.RoleDTO;
+import com.employee_leave_tracker.backend.exception.ArgumentNotValidException;
 import com.employee_leave_tracker.backend.exception.NoDataFoundException;
 import com.employee_leave_tracker.backend.model.auth.Role;
 import com.employee_leave_tracker.backend.model.auth.UserAccount;
@@ -82,47 +83,58 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public String assignRoles(RoleAssignReqDTO request) {
 
-        UserAccount user = userAccountRepository.findByEmployeeId(request.employeeId())
-                .orElseThrow(() -> new NoDataFoundException("User not found"));
-
         Set<Long> requestedRoleIds = new HashSet<>(request.roleIds());
 
-        List<UserRole> existingUserRoles = userRoleRepository.findByUser(user.getId());
+        UserAccount user = userAccountRepository.findWithEmployeeAndDepartmentByEmployeeId(request.employeeId())
+                .orElseThrow(() -> new NoDataFoundException("User or Employee details not found"));
 
-        Set<Long> existingRoleIds = existingUserRoles.stream()
-                .map(ur -> ur.getRole().getId())
+
+        Set<Long> existingRoleIds = userRoleRepository.findRoleIdsByUserId(user.getId());
+
+        // add or remove id list
+        Set<Long> roleIdsToAdd = requestedRoleIds.stream()
+                .filter(id -> !existingRoleIds.contains(id))
                 .collect(Collectors.toSet());
 
-        // add set
-        Set<Long> roleIdsToAdd = new HashSet<>(requestedRoleIds);
-        roleIdsToAdd.removeAll(existingRoleIds);
+        Set<Long> roleIdsToRemove = existingRoleIds.stream()
+                .filter(id -> !requestedRoleIds.contains(id))
+                .collect(Collectors.toSet());
 
-        // remove set
-        Set<Long> roleIdsToRemove = new HashSet<>(existingRoleIds);
-        roleIdsToRemove.removeAll(requestedRoleIds);
-
-
-        // remove user role
+        // delete
         if (!roleIdsToRemove.isEmpty()) {
-            userRoleRepository.deleteByUserAndRoleIds(user.getId(), roleIdsToRemove);
+            userRoleRepository.deleteByUserIdAndRoleIds(user.getId(), roleIdsToRemove);
         }
 
-
-        // add user role
+        // add
         if (!roleIdsToAdd.isEmpty()) {
-
             List<Role> rolesToAdd = roleRepository.findAllById(roleIdsToAdd);
 
+            // validate
+            validateHrRoleAssignment(user.getEmployee(), rolesToAdd);
+            validateManagerRoleAssignment(user.getEmployee());
+
             List<UserRole> newUserRoles = rolesToAdd.stream()
-                    .map(role -> UserRole.builder()
-                            .user(user)
-                            .role(role)
-                            .build())
+                    .map(role -> UserRole.builder().user(user).role(role).build())
                     .toList();
 
             userRoleRepository.saveAll(newUserRoles);
         }
 
         return "Roles updated successfully";
+    }
+
+    private void validateHrRoleAssignment(Employee employee, List<Role> rolesToAdd) {
+        boolean isHrAdminRequested = rolesToAdd.stream()
+                .anyMatch(role -> "HR_ADMIN".equalsIgnoreCase(role.getName()));
+
+        if (isHrAdminRequested && !"HR".equalsIgnoreCase(employee.getDepartment().getCode())) {
+            throw new ArgumentNotValidException("Only HR department members can be assigned the HR_ADMIN role.");
+        }
+    }
+
+    private void validateManagerRoleAssignment(Employee employee) {
+        if ( employeeRepository.existsManagerForDepartment(employee.getDepartment().getId())) {
+            throw new ArgumentNotValidException("Department already has a manager");
+        }
     }
 }

@@ -1,12 +1,11 @@
 package com.employee_leave_tracker.backend.serviceImpl;
 
-import com.employee_leave_tracker.backend.exception.ArgumentNotValidException;
+import com.employee_leave_tracker.backend.dto.leave.LeaveTypeDTO;
 import com.employee_leave_tracker.backend.exception.NoDataFoundException;
 import com.employee_leave_tracker.backend.model.employee.Employee;
 import com.employee_leave_tracker.backend.model.leave.LeaveBalance;
 import com.employee_leave_tracker.backend.model.leave.LeavePolicy;
 import com.employee_leave_tracker.backend.model.leave.LeaveType;
-import com.employee_leave_tracker.backend.repository.employee.EmployeeRepository;
 import com.employee_leave_tracker.backend.repository.leave.LeaveBalanceRepository;
 import com.employee_leave_tracker.backend.repository.leave.LeavePolicyRepository;
 import com.employee_leave_tracker.backend.repository.leave.LeaveTypeRepository;
@@ -16,68 +15,100 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.time.Year;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class LeaveBalanceServiceImpl implements LeaveBalanceService {
 
-    private final EmployeeRepository employeeRepository;
     private final LeaveTypeRepository leaveTypeRepository;
     private final LeavePolicyRepository leavePolicyRepository;
     private final LeaveBalanceRepository leaveBalanceRepository;
 
 
     @Override
-    @Transactional
-    public LeaveBalance getOrCreateBalance(Long employeeId, Long leaveTypeId) {
-        Integer currentYear = Year.now().getValue();
+    public LeaveBalance getOrCreateBalance(Long employeeId, Long leaveTypeId, Integer year) {
         return leaveBalanceRepository
-                .findByEmployeeIdAndLeaveTypeIdAndYear(employeeId, leaveTypeId, currentYear)
-                .orElseGet(() -> initializeBalance(employeeId, leaveTypeId, currentYear));
+                .findByEmployeeIdAndLeaveTypeIdAndYear(employeeId, leaveTypeId, year)
+                .orElseThrow(() -> new NoDataFoundException("Leave balance not found"));
+    }
+
+
+    @Transactional
+    public void createEmployeeLeaveBalances(Employee employee, Integer year) {
+
+
+        // Active leave types
+        List<LeaveType> leaveTypes = leaveTypeRepository.findByIsActive(true);
+        if (leaveTypes.isEmpty()) {
+            return; // noting to create
+        }
+
+        //Existing balances (avoid duplicates)
+        List<LeaveBalance> existingBalances =
+                leaveBalanceRepository.findByEmployeeIdAndYear(employee.getId(), year);
+
+        Set<Long> existingLeaveTypeIds = existingBalances.stream()
+                .map(lb -> lb.getLeaveType().getId())
+                .collect(Collectors.toSet());
+
+        //Fetch policies in bulk
+        List<LeavePolicy> policies =
+                leavePolicyRepository.findActiveByEmploymentType(employee.getEmploymentType());
+
+        Map<Long, LeavePolicy> policyMap = policies.stream()
+                .collect(Collectors.toMap(lp -> lp.getLeaveType().getId(), Function.identity()));
+
+        List<LeaveBalance> newBalances = new ArrayList<>();
+
+        for (LeaveType leaveType : leaveTypes) {
+
+            //Skip if already exists
+            if (existingLeaveTypeIds.contains(leaveType.getId())) {
+                continue;
+            }
+
+            LeavePolicy policy = policyMap.get(leaveType.getId());
+            // Skip if policy does not exist
+            if (policy == null) {
+                continue;
+            }
+
+            LeaveBalance balance = buildLeaveBalance(employee, leaveType, policy, year);
+            newBalances.add(balance);
+        }
+
+        if (!newBalances.isEmpty()) {
+            leaveBalanceRepository.saveAll(newBalances);
+        }
     }
 
     @Override
-    @Transactional
-    public List<LeaveBalance> getEmployeeBalances(Long employeeId) {
-        Integer currentYear = Year.now().getValue();
+    public List<LeaveTypeDTO> geEmployeeLeaveTypesWithBalance(Long employeeId, Integer year) {
 
-        List<LeaveType> activeLeaveTypes = leaveTypeRepository.findByIsActive(true);
-
-        List<LeaveBalance> balances = new ArrayList<>();
-        for (LeaveType leaveType : activeLeaveTypes) {
-            LeaveBalance balance = leaveBalanceRepository
-                    .findByEmployeeIdAndLeaveTypeIdAndYear(employeeId, leaveType.getId(), currentYear)
-                    .orElseGet(() -> initializeBalance(employeeId, leaveType.getId(), currentYear));
-
-            if (balance != null) {
-                balances.add(balance);
-            }
-        }
-
-        return balances;
+        return leaveBalanceRepository.findAllByEmployeeIdAndYear(employeeId, year)
+                .stream()
+                .map(this::buildLeaveTypeDTO)
+                .toList();
     }
 
+    private LeaveTypeDTO buildLeaveTypeDTO(LeaveBalance balance) {
+        return new LeaveTypeDTO(
+                balance.getLeaveType().getId(),
+                balance.getLeaveType().getName(),
+                balance.getAllocatedDays(),
+                balance.getUsedDays()
+        );
+    }
 
-    private LeaveBalance initializeBalance(Long employeeId, Long leaveTypeId,
-                                           Integer year) {
-
-        Employee employee = employeeRepository.findById(employeeId)
-                .orElseThrow(() -> new NoDataFoundException("Employee not found"));
-
-        // Find active policy for this leave type and employment type
-        LeavePolicy policy = leavePolicyRepository
-                .findActiveByLeaveTypeIdAndEmploymentType(leaveTypeId, employee.getEmploymentType())
-                .orElseThrow(() -> new NoDataFoundException("No policy found for this leave type and employment type"));
-
-
-        LeaveType leaveType = leaveTypeRepository.findById(leaveTypeId)
-                .orElseThrow(() -> new NoDataFoundException("Leave type not found"));
-
-        // Calculate allocated days based on joining date if in current year
+    private LeaveBalance buildLeaveBalance(Employee employee, LeaveType leaveType,
+                                           LeavePolicy policy, Integer year) {
         Double allocatedDays = calculateAllocatedDays(employee, policy, year);
 
         LeaveBalance balance = new LeaveBalance();
@@ -87,10 +118,9 @@ public class LeaveBalanceServiceImpl implements LeaveBalanceService {
         balance.setYear(year);
         balance.setAllocatedDays(allocatedDays);
         balance.setUsedDays(0.0);
-        balance.setPendingDays(0.0);
         balance.setAvailableDays(allocatedDays);
-
-        return leaveBalanceRepository.save(balance);
+        balance.setPendingDays(0.0);
+        return balance;
     }
 
     private Double calculateAllocatedDays(Employee employee, LeavePolicy policy, Integer year) {
@@ -116,6 +146,14 @@ public class LeaveBalanceServiceImpl implements LeaveBalanceService {
         return 0.0;
     }
 
+    @Override
+    @Transactional
+    public void setPendingLeaveBalance(Long empId, Long typeId, double days, int year) {
+        LeaveBalance balance = leaveBalanceRepository.findByEmployeeIdAndLeaveTypeIdAndYear(empId, typeId, year)
+                .orElseThrow(() -> new NoDataFoundException("Balance not found"));
+        balance.setPendingDays(balance.getPendingDays() + days);
+        leaveBalanceRepository.save(balance);
+    }
 
     @Override
     @Transactional
@@ -123,6 +161,8 @@ public class LeaveBalanceServiceImpl implements LeaveBalanceService {
         LeaveBalance balance = leaveBalanceRepository.findByEmployeeIdAndLeaveTypeIdAndYear(empId, typeId, year)
                 .orElseThrow(() -> new NoDataFoundException("Balance not found"));
         balance.setAvailableDays(balance.getAvailableDays() - days);
+        balance.setUsedDays(balance.getUsedDays() + days);
+        balance.setPendingDays(balance.getPendingDays() - days);
         leaveBalanceRepository.save(balance);
     }
 
@@ -132,6 +172,9 @@ public class LeaveBalanceServiceImpl implements LeaveBalanceService {
         LeaveBalance balance = leaveBalanceRepository.findByEmployeeIdAndLeaveTypeIdAndYear(empId, typeId, year)
                 .orElseThrow(() -> new NoDataFoundException("Balance not found"));
         balance.setAvailableDays(balance.getAvailableDays() + days);
+        balance.setUsedDays(balance.getUsedDays() - days);
+
+        balance.setPendingDays(balance.getPendingDays() - days);
         leaveBalanceRepository.save(balance);
     }
 

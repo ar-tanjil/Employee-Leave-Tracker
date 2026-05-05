@@ -8,6 +8,6 @@ public interface LeaveCalculationService {
 
     double calculateLeaveDays(LocalDate start, LocalDate end, LeaveDuration duration);
 
-    void validateLeaveDateRange(LocalDate start, LocalDate end);
+    void validateLeaveDateRange(LocalDate start, LocalDate end, LeaveDuration duration);
 
 }

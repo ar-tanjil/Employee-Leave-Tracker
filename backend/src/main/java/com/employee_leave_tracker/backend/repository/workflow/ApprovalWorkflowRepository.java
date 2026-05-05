@@ -10,5 +10,5 @@ public interface ApprovalWorkflowRepository extends JpaRepository<Workflow, Long
     Optional<Workflow> findByDepartmentIdAndWorkflowType(Long departmentId,
                                                          WorkflowType workflowType);
 
-    Optional<Workflow> findByWorkflowTypeAndActiveTrue(WorkflowType type);
+    Optional<Workflow> findByWorkflowTypeAndIsActiveTrue(WorkflowType type);
 }

@@ -13,7 +13,7 @@ import com.employee_leave_tracker.backend.model.leave.LeaveRequest;
 import com.employee_leave_tracker.backend.model.leave.LeaveType;
 import com.employee_leave_tracker.backend.repository.employee.EmployeeRepository;
 import com.employee_leave_tracker.backend.repository.leave.LeaveRequestRepository;
-import com.employee_leave_tracker.backend.repository.leave.LeaveTypeRepository;
+import com.employee_leave_tracker.backend.service.LeaveApprovalService;
 import com.employee_leave_tracker.backend.service.LeaveBalanceService;
 import com.employee_leave_tracker.backend.service.LeaveCalculationService;
 import com.employee_leave_tracker.backend.service.LeaveRequestService;
@@ -35,16 +35,17 @@ public class LeaveRequestServiceImpl implements LeaveRequestService {
     private final LeaveRequestRepository requestRepository;
     private final LeaveCalculationService calculationService;
     private final LeaveBalanceService balanceService;
-    private final LeaveTypeRepository leaveTypeRepository;
     private final LeaveBalanceService leaveBalanceService;
+    private final LeaveApprovalService leaveApprovalService;
 
     @Override
     @Transactional
     public String applyLeave(LeaveReqDTO dto) {
 
         Long loggedEmployeeId = authUtils.getCurrentUserEmployeeId();
+        int year = dto.endDate().getYear();
 
-        calculationService.validateLeaveDateRange(dto.startDate(), dto.endDate());
+        calculationService.validateLeaveDateRange(dto.startDate(), dto.endDate(), dto.duration());
         if (requestRepository.existsOverlappingRequest(
                 loggedEmployeeId, dto.startDate(), dto.endDate())) {
             throw new ArgumentNotValidException("Leave request overlaps with existing request");
@@ -53,7 +54,8 @@ public class LeaveRequestServiceImpl implements LeaveRequestService {
         double requestedDays = calculationService.calculateLeaveDays(
                 dto.startDate(), dto.endDate(), dto.duration());
 
-        LeaveBalance balance = leaveBalanceService.getOrCreateBalance(loggedEmployeeId, dto.leaveTypeId());
+        LeaveBalance balance = leaveBalanceService.getOrCreateBalance(loggedEmployeeId,
+                dto.leaveTypeId(), year);
         LeavePolicy policy = balance.getLeavePolicy();
         LeaveType leaveType = balance.getLeaveType();
 
@@ -72,10 +74,15 @@ public class LeaveRequestServiceImpl implements LeaveRequestService {
         request.setTotalDays(requestedDays);
         request.setStatus(LeaveStatus.PENDING);
         request.setLeaveDuration(dto.duration());
+        request.setReason(dto.reason());
 
         requestRepository.save(request);
 
-        // TODO: Initialize Workflow
+        //Update Leave Balance
+        leaveBalanceService.setPendingLeaveBalance(loggedEmployeeId, leaveType.getId(), requestedDays, year);
+
+        //Initialize Workflow
+        leaveApprovalService.initializeLeaveApprovalSteps(request,  loggedEmployee.getDepartment());
 
         return "Leave request created successfully";
     }
@@ -83,11 +90,16 @@ public class LeaveRequestServiceImpl implements LeaveRequestService {
 
     public void validateLeaveBalanceAndPolicy(LeaveReqDTO dto, LeaveBalance balance,
                                               LeavePolicy policy, double requestedDays) {
-        // 3. Validate available balance
+        // Validate available balance
         if (balance.getAvailableDays() < requestedDays) {
             throw new ArgumentNotValidException("Insufficient leave balance");
         }
-        // 4. Validate against policy
+
+        if (balance.getAvailableDays() + balance.getPendingDays() < requestedDays) {
+            throw new ArgumentNotValidException("Insufficient leave balance with pending requests");
+        }
+
+        // Validate against policy
         if (requestedDays > policy.getMaxDaysPerRequest()) {
             throw new ArgumentNotValidException("Requested days exceed policy limit");
         }
@@ -103,36 +115,11 @@ public class LeaveRequestServiceImpl implements LeaveRequestService {
     }
 
 
-    public void validateLeaveRequest(Long employeeId, double requestedDays, LeaveReqDTO request) {
-        calculationService.validateLeaveDateRange(request.startDate(), request.endDate());
-        LeaveBalance balance = leaveBalanceService.getOrCreateBalance(employeeId, request.leaveTypeId());
-
-        LeavePolicy policy = balance.getLeavePolicy();
-
-        // 3. Validate available balance
-        if (balance.getAvailableDays() < requestedDays) {
-            throw new ArgumentNotValidException("Insufficient leave balance");
-        }
-        // 4. Validate against policy
-        if (requestedDays > policy.getMaxDaysPerRequest()) {
-            throw new ArgumentNotValidException("Requested days exceed policy limit");
-        }
-
-        if (!LeaveDuration.FULL_DAY.equals(request.duration()) && !policy.isAllowHalfDay()) {
-            throw new ArgumentNotValidException("Half-day leave not allowed for this leave type");
-        }
-
-        long daysNotice = ChronoUnit.DAYS.between(LocalDate.now(), request.startDate());
-        if (daysNotice < policy.getMinDaysNotice()) {
-            throw new ArgumentNotValidException("Minimum notice period is " + policy.getMinDaysNotice() + " days");
-        }
-    }
 
 
     @Override
-    public List<LeaveResDTO> getLeaveRequestsByEmployee() {
-        Long loggedEmployeeId = authUtils.getCurrentUserEmployeeId();
-        return requestRepository.findByEmployeeId(loggedEmployeeId);
+    public List<LeaveResDTO> getLeaveRequestsByEmployee(Long employeeId) {
+        return requestRepository.findByEmployeeId(employeeId);
     }
 
     @Transactional

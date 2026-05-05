@@ -22,18 +22,8 @@ public class EmployeeController {
 
     private final EmployeeService employeeService;
 
-    // Only users with this permission granted via role_permission mapping
-//    @PreAuthorize("hasAuthority('EMPLOYEE_VIEW_ALL')")
-//    @GetMapping
-//    public List<EmployeeSummary> list() { /* ... */ }
-//
-//    @PreAuthorize("hasRole('ADMIN') or hasAuthority('EMPLOYEE_MANAGE')")
-//    @PostMapping("/{id}/provision")
-//    public void provision(@PathVariable Long id) { /* ... */ }
-
-
     @PostMapping
-    public ResponseEntity<CustomResponse> createOrUpdateEmployee(@RequestBody @Valid EmployeeReqDTO reqDto) {
+    public ResponseEntity<CustomResponse> createOrUpdateEmployee(@ModelAttribute @Valid EmployeeReqDTO reqDto) throws Exception {
 
         var response = employeeService.createOrUpdateEmployee(reqDto);
 
@@ -54,7 +44,7 @@ public class EmployeeController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN') or hasRole('SYSTEM_ADMIN') or hasAuthority('EMPLOYEE:MANAGE')")
+    @PreAuthorize("hasRole('HR_ADMIN') or hasRole('SYSTEM_ADMIN')")
     public ResponseEntity<CustomResponse> deleteEmployee(@PathVariable Long id) {
         employeeService.deleteEmployee(id);
         return ResponseEntity.ok(new SuccessResponse<>("Employee deleted successfully"));
@@ -71,6 +61,12 @@ public class EmployeeController {
     public ResponseEntity<CustomResponse> getAllDesignations() {
         var response = employeeService.getAllDesignations();
         return ResponseEntity.ok(new ListResponse<>(response));
+    }
+
+    @GetMapping("/dashboard")
+    public ResponseEntity<CustomResponse> getDashboard() {
+        var response = employeeService.getDashboardData();
+        return ResponseEntity.ok(new SuccessResponse<>(response));
     }
 
 }

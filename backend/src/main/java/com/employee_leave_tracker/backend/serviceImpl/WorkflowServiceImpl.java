@@ -25,7 +25,7 @@ public class WorkflowServiceImpl implements WorkflowService {
     @Transactional
     public Workflow ensureWorkflowExists(WorkflowType type) {
 
-        return workflowRepo.findByWorkflowTypeAndActiveTrue(type)
+        return workflowRepo.findByWorkflowTypeAndIsActiveTrue(type)
                 .orElseGet(() -> createDefaultWorkflow(type));
     }
 

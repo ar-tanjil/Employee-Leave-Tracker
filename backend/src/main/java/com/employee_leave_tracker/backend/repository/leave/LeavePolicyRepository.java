@@ -21,16 +21,15 @@ public interface LeavePolicyRepository extends JpaRepository<LeavePolicy, Long> 
     List<LeavePolicy> findAllActivePolicies(String employmentType);
 
 
-    @Query("SELECT lp FROM LeavePolicy lp " +
-            "WHERE lp.leaveType.id = :leaveTypeId " +
-            "AND lp.employmentType = :employmentType " +
-            "AND lp.isActive = true " +
-            "AND lp.effectiveFrom <= CURRENT_DATE " +
-            "AND (lp.effectiveTo IS NULL OR lp.effectiveTo >= CURRENT_DATE)")
-    Optional<LeavePolicy> findActiveByLeaveTypeIdAndEmploymentType(
-            @Param("leaveTypeId") Long leaveTypeId,
-            @Param("employmentType") String employmentType
-    );
+    @Query("""
+            SELECT lp FROM LeavePolicy lp
+            JOIN FETCH lp.leaveType
+            WHERE lp.employmentType = :employmentType 
+            AND lp.isActive = true 
+            AND lp.effectiveFrom <= CURRENT_DATE 
+            AND (lp.effectiveTo IS NULL OR lp.effectiveTo >= CURRENT_DATE)
+            """)
+    List<LeavePolicy> findActiveByEmploymentType(@Param("employmentType") String employmentType);
 
     List<LeavePolicy> findByIsActive(Boolean isActive);
 

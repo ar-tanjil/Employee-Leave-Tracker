@@ -1,7 +1,10 @@
 package com.employee_leave_tracker.backend.dto.employee;
 
+import lombok.Builder;
+
 import java.time.LocalDate;
 
+@Builder
 public record EmployeeResDTO(
         Long id,
         String employeeCode,
@@ -12,10 +15,10 @@ public record EmployeeResDTO(
         String departmentName,
         Long designationId,
         String designationName,
-        Long managerId,
-        String managerName,
         LocalDate hireDate,
-        String employmentType
+        String employmentType,
+        String address,
+        String image
 ) {
 
 

@@ -19,15 +19,9 @@ VALUES (7, 'EMPLOYEE', 'UPDATE', 'Can edit employee information');
 INSERT INTO permission (id, resource, action, description)
 VALUES (8, 'EMPLOYEE', 'DELETE', 'Can remove employee from the system');
 
--- Department & Designation
+-- Leave Management
 INSERT INTO permission (id, resource, action, description)
-VALUES (9, 'ORGANIZATION', 'MANAGE', 'Can create/edit departments and designations');
-
--- Payroll/Salary (Sensitive)
-INSERT INTO permission (id, resource, action, description)
-VALUES (10, 'PAYROLL', 'VIEW', 'Can view salary structures');
-INSERT INTO permission (id, resource, action, description)
-VALUES (11, 'PAYROLL', 'EDIT', 'Can modify salary and bonuses');
+VALUES (9, 'LEAVE', 'APPROVE', 'Can approve / reject leave requests');
 
 
 -- ROLE DATA
@@ -38,7 +32,7 @@ VALUES (2, 'HR_ADMIN', 'Manage employees and departments', false);
 INSERT INTO role (id, name, description, is_system_role)
 VALUES (3, 'MANAGER', 'Manage team assignments and view reports', false);
 INSERT INTO role (id, name, description, is_system_role)
-VALUES (4, 'EMPLOYEE', 'Self-service access only', false);
+VALUES (4, 'EMPLOYEE', 'Self-service access only', true);
 
 
 -- ROLE PERMISSION MAP
@@ -53,9 +47,7 @@ VALUES (1, 1),
        (1, 6),
        (1, 7),
        (1, 8),
-       (1, 9),
-       (1, 10),
-       (1, 11);
+       (1, 9);
 
 -- HR_ADMIN: Can manage employees and organization, but maybe not delete system users
 INSERT INTO role_permission(role_id, permission_id)
@@ -140,14 +132,14 @@ VALUES (1, 'Annual Leave', 'ANNUAL', 'Yearly paid leave for employees', true, fa
 INSERT INTO leave_policy (id, name, leave_type_id, max_days_per_year, max_days_per_request, min_days_notice,
                           allow_half_day, employment_type, effective_from, effective_to, is_active)
 VALUES (1, 'Annual Leave Policy', 1, 20, 10, 2, true,
+        'FULL_TIME', '2026-01-01', NULL, false),
+       (2, 'Sick Leave Policy', 2, 7, 5, 0, true,
         'FULL_TIME', '2026-01-01', NULL, true),
-       (2, 'Sick Leave Policy', 2, 14, 5, 0, true,
-        'ALL', '2026-01-01', NULL, true),
-       (3, 'Casual Leave Policy', 3, 10, 3, 1, true,
+       (3, 'Casual Leave Policy', 3, 15, 3, 1, true,
         'FULL_TIME', '2026-01-01', NULL, true),
        (4, 'Maternity Leave Policy', 4, 120, 120, 30, false,
         'FEMALE', '2026-01-01', NULL, false),
        (5, 'Paternity Leave Policy', 5, 7, 7, 7, false,
         'MALE', '2026-01-01', NULL, false),
-       (6, 'Unpaid Leave Policy', 6, 60, 30, 3, true,
-        'ALL', '2026-01-01', NULL, true);
+       (6, 'Unpaid Leave Policy', 6, 15, 30, 3, true,
+        'FULL_TIME', '2026-01-01', NULL, true);

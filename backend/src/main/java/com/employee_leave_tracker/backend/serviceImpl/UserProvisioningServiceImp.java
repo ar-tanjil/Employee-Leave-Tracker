@@ -1,13 +1,14 @@
 package com.employee_leave_tracker.backend.serviceImpl;
 
-import com.employee_leave_tracker.backend.model.employee.Employee;
+import com.employee_leave_tracker.backend.dto.auth.PasswordChangeDto;
 import com.employee_leave_tracker.backend.model.auth.Role;
 import com.employee_leave_tracker.backend.model.auth.UserAccount;
 import com.employee_leave_tracker.backend.model.auth.UserRole;
-import com.employee_leave_tracker.backend.repository.employee.EmployeeRepository;
+import com.employee_leave_tracker.backend.model.employee.Employee;
 import com.employee_leave_tracker.backend.repository.auth.RoleRepository;
 import com.employee_leave_tracker.backend.repository.auth.UserAccountRepository;
 import com.employee_leave_tracker.backend.repository.auth.UserRoleRepository;
+import com.employee_leave_tracker.backend.repository.employee.EmployeeRepository;
 import com.employee_leave_tracker.backend.service.UserProvisioningService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -54,8 +55,31 @@ public class UserProvisioningServiceImp implements UserProvisioningService {
         assignDefaultRole(saved);
     }
 
+    @Override
+    public void provisionUserFromEmployee(Employee employee) {
+        if (userAccountRepo.existsByEmployeeId(employee.getId())) {
+            throw new IllegalStateException("User account already exists for employee");
+        }
+
+        String username = resolveUsername(employee);
+        UserAccount account = UserAccount.builder()
+                .employee(employee)
+                .username(username)
+                .passwordHash(passwordEncoder.encode(employee.getFirstName()))
+                .status("ACTIVE")
+                .isDeleted(false)
+                .build();
+
+        UserAccount saved = userAccountRepo.save(account);
+
+
+        assignDefaultRole(saved);
+    }
+
+
     /**
      * Assigns the default role to the user account.
+     *
      * @param userAccount the user account to which the default role will be assigned
      */
     private void assignDefaultRole(UserAccount userAccount) {
@@ -72,6 +96,7 @@ public class UserProvisioningServiceImp implements UserProvisioningService {
 
     /**
      * Resolves the username for the given employee.
+     *
      * @param employee the employee for which the username will be resolved
      * @return the resolved username
      */

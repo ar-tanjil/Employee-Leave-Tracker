@@ -32,4 +32,12 @@ public interface LeaveBalanceRepository extends JpaRepository<LeaveBalance, Long
             @Param("employeeId") Long employeeId,
             @Param("year") Integer year
     );
+
+    @Query("""
+            select lb from LeaveBalance lb
+            join fetch lb.leaveType
+            where lb.employee.id = :employeeId
+            and lb.year = :year
+            """)
+    List<LeaveBalance> findAllByEmployeeIdAndYear(Long employeeId, Integer year);
 }

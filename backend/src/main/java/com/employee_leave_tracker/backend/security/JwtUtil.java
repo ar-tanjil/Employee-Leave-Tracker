@@ -13,6 +13,7 @@ import javax.crypto.SecretKey;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.Function;
 
 @Component
@@ -32,6 +33,8 @@ public class JwtUtil {
         Map<String, Object> claims = new HashMap<>();
         claims.put("roles", userDetails.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
+                .filter(Objects::nonNull)
+                .filter(authority -> authority.startsWith("ROLE_"))
                 .toList());
         return buildToken(claims, userDetails.getUsername());
     }

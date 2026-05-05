@@ -17,7 +17,7 @@ import java.math.BigDecimal;
 @Entity
 @Table(name = "leave_balance",
         uniqueConstraints = {
-                @UniqueConstraint(columnNames = {"employee_id", "leave_type_id", "year"})
+                @UniqueConstraint(columnNames = {"employee_id", "leave_type_id", "leave_year"})
         }
 )
 public class LeaveBalance extends BaseAuditEntity {
@@ -38,6 +38,7 @@ public class LeaveBalance extends BaseAuditEntity {
     @JoinColumn(name = "leave_policy_id", nullable = false)
     private LeavePolicy leavePolicy;
 
+    @Column(name = "leave_year")
     private Integer year;
 
     private Double allocatedDays;

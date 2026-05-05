@@ -20,18 +20,28 @@ public interface UserAccountRepository extends JpaRepository<UserAccount, Long> 
 
     @Query("""
                 SELECT u.id FROM UserAccount u
-                JOIN UserRole ur ON ur.user.id = u.id
+                JOIN u.userRoles ur
+                JOIN Employee e ON e.id = u.employee.id
                 WHERE ur.role.name = :role
-                ORDER BY u.id ASC
             """)
-    Optional<Long> findFirstByRole(String role);
+    Optional<Long> findManagerUserIdByRole(String role);
 
     @Query("""
                 SELECT u.id FROM UserAccount u
                 WHERE u.employee.id = (
-                    SELECT e.manager.id FROM Employee e WHERE e.id = :employeeId
+                    SELECT e.id FROM Employee e
+                    JOIN e.department d
+                    WHERE d.id = :departmentId
                 )
             """)
-    Optional<Long> findManagerUserIdByEmployeeId(Long employeeId);
+    Optional<Long> findManagerUserIdByDepartmentId(Long departmentId);
 
+    @Query("""
+            SELECT u
+            FROM UserAccount u
+            JOIN FETCH Employee e ON u.employee.id = e.id
+            JOIN FETCH Department d ON e.department.id = d.id
+            WHERE e.id = :employeeId
+            """)
+    Optional<UserAccount> findWithEmployeeAndDepartmentByEmployeeId(Long employeeId);
 }

@@ -28,10 +28,16 @@ public class LeaveCalculationServiceImpl implements LeaveCalculationService {
     }
 
     @Override
-    public void validateLeaveDateRange(LocalDate start, LocalDate end) {
+    public void validateLeaveDateRange(LocalDate start, LocalDate end, LeaveDuration duration) {
+
+        if (duration != LeaveDuration.FULL_DAY && !start.equals(end)) {
+            throw new ArgumentNotValidException("Start and end date must be the same for half-day leave");
+        }
+
         if (start.isAfter(end)) {
             throw new ArgumentNotValidException("Start date cannot be after end date");
         }
+
         if (start.isBefore(LocalDate.now())) {
             throw new ArgumentNotValidException("Cannot apply for leave in the past");
         }

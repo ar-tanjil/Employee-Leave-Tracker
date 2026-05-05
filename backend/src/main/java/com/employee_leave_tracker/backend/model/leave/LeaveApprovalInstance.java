@@ -22,7 +22,7 @@ public class LeaveApprovalInstance {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "request_id")
     private LeaveRequest leaveRequest;
 
@@ -33,13 +33,16 @@ public class LeaveApprovalInstance {
     private Integer stepOrder;
 
     @Column(name = "approver_id")
-    private Long approverId;
+    private Long approverId; // user id
 
     @Enumerated(EnumType.STRING)
     private ApprovalStatus status;
 
     private String comments;
+
     private boolean isActive;
+
+    private LocalDateTime createdAt;
 
     private LocalDateTime actionDate;
 }

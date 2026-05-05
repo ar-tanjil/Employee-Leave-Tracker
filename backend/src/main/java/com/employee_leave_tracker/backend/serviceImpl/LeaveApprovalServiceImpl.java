@@ -4,8 +4,11 @@ import com.employee_leave_tracker.backend.constant.ApprovalStatus;
 import com.employee_leave_tracker.backend.constant.ApproverType;
 import com.employee_leave_tracker.backend.constant.LeaveStatus;
 import com.employee_leave_tracker.backend.constant.WorkflowType;
+import com.employee_leave_tracker.backend.dto.leave.LeaveApproverInstanceResDTO;
+import com.employee_leave_tracker.backend.dto.workflow.ApprovalActionDTO;
 import com.employee_leave_tracker.backend.exception.ArgumentNotValidException;
 import com.employee_leave_tracker.backend.exception.UnauthorizedException;
+import com.employee_leave_tracker.backend.model.employee.Department;
 import com.employee_leave_tracker.backend.model.leave.LeaveApprovalInstance;
 import com.employee_leave_tracker.backend.model.leave.LeaveRequest;
 import com.employee_leave_tracker.backend.model.workflow.Workflow;
@@ -18,9 +21,11 @@ import com.employee_leave_tracker.backend.service.LeaveBalanceService;
 import com.employee_leave_tracker.backend.service.WorkflowService;
 import com.employee_leave_tracker.backend.util.AuthUtils;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -38,7 +43,7 @@ public class LeaveApprovalServiceImpl implements LeaveApprovalService {
 
 
     @Transactional
-    public void initializeLeaveApprovalSteps(LeaveRequest request) {
+    public void initializeLeaveApprovalSteps(LeaveRequest request, Department department) {
         Workflow workflow = workflowService.ensureWorkflowExists(WorkflowType.LEAVE);
         List<WorkflowStep> stepList = workflowService.findAllWorkflowSteps(workflow.getId());
         if (stepList.isEmpty()) {
@@ -47,11 +52,13 @@ public class LeaveApprovalServiceImpl implements LeaveApprovalService {
 
         List<LeaveApprovalInstance> instancesList = new ArrayList<>();
 
+        long currentStep = 1;
         for (WorkflowStep step : stepList) {
 
-            Long approverId = resolveApproverId(step.getApproverType(), request.getEmployee().getId());
+            Long approverId = resolveApproverId(step.getApproverType(), department);
 
             if (approverId == null) {
+                currentStep++;
                 continue;
             }
 
@@ -60,7 +67,8 @@ public class LeaveApprovalServiceImpl implements LeaveApprovalService {
             instance.setApproverId(approverId);
             instance.setStepOrder(step.getStepOrder());
             instance.setStatus(ApprovalStatus.PENDING);
-            instance.setActive(step.getStepOrder() == 1);
+            instance.setActive(step.getStepOrder() == currentStep);
+            instance.setCreatedAt(LocalDateTime.now());
 
             instancesList.add(instance);
 
@@ -70,15 +78,21 @@ public class LeaveApprovalServiceImpl implements LeaveApprovalService {
         leaveApprovalInstanceRepo.saveAll(instancesList);
     }
 
-    private Long resolveApproverId(ApproverType type, Long employeeId) {
+    private Long resolveApproverId(ApproverType type, Department department) {
+
+        // hr department has one layer
+        if (department == null) {
+            throw new ArgumentNotValidException("Department cannot be null");
+        } else if ("HR".equalsIgnoreCase(department.getCode()) && ApproverType.MANAGER.equals(type)) {
+            return null;
+        }
 
         return switch (type) {
             case MANAGER -> userAccountRepository
-                    .findManagerUserIdByEmployeeId(employeeId)
+                    .findManagerUserIdByDepartmentId(department.getId())
                     .orElse(null);
             case HR_ADMIN -> userAccountRepository
-                    .findFirstByRole("HR_ADMIN")
-                    .or(() -> userAccountRepository.findFirstByRole("SYSTEM_ADMIN"))
+                    .findManagerUserIdByRole("HR_ADMIN")
                     .orElseThrow(() -> new RuntimeException("No HR/SYSTEM admin found"));
         };
     }
@@ -86,22 +100,26 @@ public class LeaveApprovalServiceImpl implements LeaveApprovalService {
 
     @Override
     @Transactional
-    public void approveLeave(Long approvalInstanceId) {
+    public void approveLeave(ApprovalActionDTO dto) {
 
         Long loggedUserId = authUtils.getCurrentUserId();
 
-        LeaveApprovalInstance current = getCurrentStep(approvalInstanceId, WorkflowType.LEAVE);
+        LeaveApprovalInstance current = leaveApprovalInstanceRepo
+                .findByIdAndIsActiveTrue(dto.approvalInstanceId())
+                .orElseThrow(() -> new RuntimeException("No active step found"));
 
         if (!current.getApproverId().equals(loggedUserId)) {
-            throw new UnauthorizedException("Unauthorized approver");
+            throw new AccessDeniedException("Unauthorized approver");
         }
 
         current.setStatus(ApprovalStatus.APPROVED);
         current.setActive(false);
+        current.setComments(dto.comments());
+        current.setActionDate(LocalDateTime.now());
 
         // Find next step
         List<LeaveApprovalInstance> allSteps =
-                leaveApprovalInstanceRepo.findByIdOrderByStepOrderAsc(approvalInstanceId);
+                leaveApprovalInstanceRepo.findByLeaveRequestIdOrderByStepOrderAsc(current.getLeaveRequest().getId());
 
         Optional<LeaveApprovalInstance> nextStep = allSteps.stream()
                 .filter(s -> s.getStepOrder() > current.getStepOrder())
@@ -128,22 +146,26 @@ public class LeaveApprovalServiceImpl implements LeaveApprovalService {
 
     @Override
     @Transactional
-    public void rejectLeave(Long approvalInstanceId) {
+    public void rejectLeave(ApprovalActionDTO dto) {
 
         Long loggedUserId = authUtils.getCurrentUserId();
 
-        LeaveApprovalInstance current = getCurrentStep(approvalInstanceId, WorkflowType.LEAVE);
+        LeaveApprovalInstance current = leaveApprovalInstanceRepo
+                .findByIdAndIsActiveTrue(dto.approvalInstanceId())
+                .orElseThrow(() -> new RuntimeException("No active step found"));
 
         if (!current.getApproverId().equals(loggedUserId)) {
-            throw new UnauthorizedException("Unauthorized approver");
+            throw new AccessDeniedException("Unauthorized approver");
         }
 
         current.setStatus(ApprovalStatus.REJECTED);
         current.setActive(false);
+        current.setComments(dto.comments());
+        current.setActionDate(LocalDateTime.now());
 
         // Reject all remaining steps
         List<LeaveApprovalInstance> allSteps =
-                leaveApprovalInstanceRepo.findByIdOrderByStepOrderAsc(approvalInstanceId);
+                leaveApprovalInstanceRepo.findByLeaveRequestIdOrderByStepOrderAsc(current.getLeaveRequest().getId());
 
         allSteps.stream()
                 .filter(s -> s.getStepOrder() > current.getStepOrder())
@@ -159,9 +181,36 @@ public class LeaveApprovalServiceImpl implements LeaveApprovalService {
     }
 
 
-    private LeaveApprovalInstance getCurrentStep(Long referenceId, WorkflowType type) {
+    @Override
+    public List<LeaveApproverInstanceResDTO> getAllPendingLeaveRequests(Long approverId) {
+
         return leaveApprovalInstanceRepo
-                .findByIdAndActiveTrue(referenceId)
-                .orElseThrow(() -> new RuntimeException("No active step found"));
+                .findByApproverIdAndStatusPending(approverId)
+                .stream()
+                .map(this::buildLeaveApproverInstanceResDTO)
+                .toList();
+    }
+
+    private LeaveApproverInstanceResDTO buildLeaveApproverInstanceResDTO(LeaveApprovalInstance instance) {
+
+        var leaveRequest = instance.getLeaveRequest();
+        var employee = leaveRequest.getEmployee();
+        var leaveType = leaveRequest.getLeaveType();
+
+        return LeaveApproverInstanceResDTO.builder()
+                .referenceId(instance.getId())
+                .leaveId(leaveRequest.getId())
+                .employeeName("%s %s (%s)".formatted(
+                        employee.getFirstName(),
+                        employee.getLastName(),
+                        employee.getEmployeeCode()))
+                .leaveTypeName(leaveType.getName())
+                .leaveDuration(leaveRequest.getLeaveDuration())
+                .startDate(leaveRequest.getStartDate())
+                .endDate(leaveRequest.getEndDate())
+                .totalDays(leaveRequest.getTotalDays())
+                .status(leaveRequest.getStatus())
+                .reason(leaveRequest.getReason())
+                .build();
     }
 }

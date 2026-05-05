@@ -3,11 +3,15 @@ package com.employee_leave_tracker.backend.exception.handler;
 import com.employee_leave_tracker.backend.dto.CustomErrorResponse;
 import com.employee_leave_tracker.backend.exception.ArgumentNotValidException;
 import com.employee_leave_tracker.backend.exception.NoDataFoundException;
+import com.employee_leave_tracker.backend.exception.UnauthorizedException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -53,6 +57,24 @@ public class GlobalExceptionHandler {
                 .body(response);
     }
 
+
+    @ExceptionHandler(UnauthorizedException.class)
+    public ResponseEntity<CustomErrorResponse> handleUnauthorizedException(UnauthorizedException ex,
+                                                                               HttpServletRequest request) {
+        log.error(ex.getMessage(), ex);
+
+        CustomErrorResponse response = new CustomErrorResponse(
+                ex.getMessage(),
+                ex.getStatus().value(),
+                ex.getStatus().name(),
+                request.getRequestURI()
+        );
+
+        return ResponseEntity
+                .status(HttpStatus.UNAUTHORIZED)
+                .body(response);
+    }
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<CustomErrorResponse> handleValidationException(MethodArgumentNotValidException ex,
                                                                          HttpServletRequest request) {
@@ -73,8 +95,59 @@ public class GlobalExceptionHandler {
                 .body(response);
     }
 
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<CustomErrorResponse> handleAccessDeniedException(AccessDeniedException ex,
+                                                                           HttpServletRequest request) {
+        log.error(ex.getMessage(), ex);
+
+        CustomErrorResponse response = new CustomErrorResponse(
+                ex.getMessage(),
+                HttpStatus.FORBIDDEN.value(),
+                HttpStatus.FORBIDDEN.name(),
+                request.getRequestURI()
+        );
+
+        return ResponseEntity
+                .status( HttpStatus.FORBIDDEN)
+                .body(response);
+    }
+
+    @ExceptionHandler(UsernameNotFoundException.class)
+    public ResponseEntity<CustomErrorResponse> handleUsernameNotFoundException(UsernameNotFoundException ex,
+                                                                             HttpServletRequest request) {
+        log.error(ex.getMessage(), ex);
+
+        CustomErrorResponse response = new CustomErrorResponse(
+                ex.getMessage(),
+                HttpStatus.UNAUTHORIZED.value(),
+                HttpStatus.UNAUTHORIZED.name(),
+                request.getRequestURI()
+        );
+
+        return ResponseEntity
+                .status(HttpStatus.UNAUTHORIZED)
+                .body(response);
+    }
+
+    @ExceptionHandler(AuthenticationException.class)
+    public ResponseEntity<CustomErrorResponse> handleAuthenticationException(AuthenticationException ex,
+                                                                               HttpServletRequest request) {
+        log.error(ex.getMessage(), ex);
+
+        CustomErrorResponse response = new CustomErrorResponse(
+                ex.getMessage(),
+                HttpStatus.UNAUTHORIZED.value(),
+                HttpStatus.UNAUTHORIZED.name(),
+                request.getRequestURI()
+        );
+
+        return ResponseEntity
+                .status(HttpStatus.UNAUTHORIZED)
+                .body(response);
+    }
+
     @ExceptionHandler(BadCredentialsException.class)
-    public ResponseEntity<CustomErrorResponse> handleUsernameNotFoundException(BadCredentialsException ex,
+    public ResponseEntity<CustomErrorResponse> handleBadCredentialsException(BadCredentialsException ex,
                                                                                HttpServletRequest request) {
         log.error(ex.getMessage(), ex);
 

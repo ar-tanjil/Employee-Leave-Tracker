@@ -37,5 +37,8 @@ public interface UserRoleRepository extends JpaRepository<UserRole, Long> {
                 WHERE ur.user.id = :userId
                 AND ur.role.id IN :roleIds
             """)
-    void deleteByUserAndRoleIds(Long userId, Set<Long> roleIds);
+    void deleteByUserIdAndRoleIds(Long userId, Set<Long> roleIds);
+
+    @Query("SELECT DISTINCT ur.role.id FROM UserRole ur WHERE ur.user.id = :userId")
+    Set<Long> findRoleIdsByUserId(@Param("userId") Long userId);
 }

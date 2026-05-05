@@ -12,16 +12,13 @@ import org.mapstruct.MappingTarget;
 public interface EmployeeMapper {
 
     @Mapping(target = "id", ignore = true)
+    @Mapping(target = "image", ignore = true)
     Employee toEmployee(EmployeeReqDTO employeeReqDto);
-
-    EmployeeReqDTO toEmployeeReqDto(Employee employee);
 
     @Mapping(target = "designationName", source = "designation.name")
     @Mapping(target = "designationId", source = "designation.id")
     @Mapping(target = "departmentName", source = "department.name")
     @Mapping(target = "departmentId", source = "department.id")
-    @Mapping(target = "managerName", source = "manager.firstName")
-    @Mapping(target = "managerId", source = "manager.id")
     EmployeeResDTO toEmployeeResDto(Employee employee);
 
     @Mapping(target = "designation", source = "designation.name")
@@ -29,5 +26,8 @@ public interface EmployeeMapper {
     EmployeeTableResDTO toEmployeeTableResDto(Employee employee);
 
     @Mapping(target = "id", ignore = true)
+    @Mapping(target = "image", ignore = true)
+    @Mapping(target = "email", ignore = true)
+    @Mapping(target = "hireDate", ignore = true)
     void updateEmployeeFromReqDto(EmployeeReqDTO reqDto, @MappingTarget Employee employee);
 }
