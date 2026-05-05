@@ -42,10 +42,6 @@ public class Employee extends BaseAuditEntity {
     @JoinColumn(name = "designation_id")
     private Designation designation;
 
-    @ManyToOne
-    @JoinColumn(name = "manager_id")
-    private Employee manager;
-
     @Column(name = "hire_date")
     private LocalDate hireDate;
 
@@ -55,10 +51,24 @@ public class Employee extends BaseAuditEntity {
     @Column(name = "employment_type")
     private String employmentType;
 
+    @Column(name = "address")
+    private String address;
+
+    @Lob
+    @Column(columnDefinition = "TEXT")
+    private String image;
+
     @Column(name = "is_active", nullable = false, columnDefinition = "boolean default true")
     private Boolean isActive;
 
     @Column(name = "is_deleted", nullable = false, columnDefinition = "boolean default false")
     private Boolean isDeleted;
+
+    @PostPersist
+    public void generateEmployeeCode() {
+        String prefix = "EMP";
+        int year = LocalDate.now().getYear();
+        this.employeeCode = String.format("%s-%d-%03d", prefix, year, this.id);
+    }
 
 }
