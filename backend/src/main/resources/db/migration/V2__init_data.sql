@@ -143,3 +143,28 @@ VALUES (1, 'Annual Leave Policy', 1, 20, 10, 2, true,
         'MALE', '2026-01-01', NULL, false),
        (6, 'Unpaid Leave Policy', 6, 15, 30, 3, true,
         'FULL_TIME', '2026-01-01', NULL, true);
+
+
+-- Insert admin user only if not exists
+INSERT INTO user_account (username, password_hash, status, is_deleted)
+SELECT 'admin',
+       'admin@123#',
+       'ACTIVE',
+       false WHERE NOT EXISTS (
+    SELECT 1
+    FROM user_account
+    WHERE username = 'admin'
+      AND is_deleted = false
+);
+
+-- Assign SYSTEM_ADMIN role to admin user if not assigned
+INSERT INTO user_role (user_id, role_id)
+SELECT u.id,
+       r.id
+FROM user_account u
+         JOIN role r ON r.name = 'SYSTEM_ADMIN'
+WHERE u.username = 'admin'
+  AND NOT EXISTS (SELECT 1
+                  FROM user_role ur
+                  WHERE ur.user_id = u.id
+                    AND ur.role_id = r.id);

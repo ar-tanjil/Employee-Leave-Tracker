@@ -5,13 +5,12 @@ import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
-import java.util.List;
 import java.util.Optional;
 
 public interface UserAccountRepository extends JpaRepository<UserAccount, Long> {
 
     @EntityGraph(attributePaths = "employee")
-    Optional<UserAccount> findByUsername(String username);
+    Optional<UserAccount> findByUsernameAndIsDeletedFalse(String username);
 
     boolean existsByEmployeeId(Long employeeId);
 
@@ -31,6 +30,8 @@ public interface UserAccountRepository extends JpaRepository<UserAccount, Long> 
                 WHERE u.employee.id = (
                     SELECT e.id FROM Employee e
                     JOIN e.department d
+                    JOIN UserAccount ua ON ua.employee.id = e.id
+                    JOIN ua.userRoles ur ON ur.role.name = 'MANAGER'
                     WHERE d.id = :departmentId
                 )
             """)

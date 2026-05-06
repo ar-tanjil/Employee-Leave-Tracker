@@ -30,7 +30,8 @@
     </ng-template>
 
     <ng-template appCell="status" let-row>
-      <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-800 text-red-50">
+      <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium"
+        [class]="getStatusClass(row.status)">
         {{ row.status }}
       </span>
     </ng-template>

@@ -1,5 +1,6 @@
 package com.employee_leave_tracker.backend.model.auth;
 
+import com.employee_leave_tracker.backend.constant.UserStatus;
 import com.employee_leave_tracker.backend.model.BaseAuditEntity;
 import com.employee_leave_tracker.backend.model.employee.Employee;
 import jakarta.persistence.*;
@@ -34,8 +35,9 @@ public class UserAccount extends BaseAuditEntity {
     @Column(name = "password_hash")
     private String passwordHash;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "status")
-    private String status = "ACTIVE";
+    private UserStatus status;
 
     @Column(name = "last_login_at")
     private LocalDateTime lastLoginAt;
@@ -47,10 +49,11 @@ public class UserAccount extends BaseAuditEntity {
     private List<UserRole> userRoles = new ArrayList<>();
 
     public boolean isActive() {
-        return "ACTIVE".equals(status);
+        return UserStatus.ACTIVE.equals(status);
     }
 
     public boolean isLocked() {
-        return "LOCKED".equals(status);
+        return UserStatus.LOCKED.equals(status);
     }
+
 }

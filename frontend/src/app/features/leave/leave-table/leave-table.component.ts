@@ -69,6 +69,15 @@ export class LeaveTableComponent {
     this.showForm.set(false);
   }
 
+  // presentation
+  getStatusClass(status: string): string {
+  switch (status) {
+    case 'APPROVED': return 'bg-green-100 text-green-800';
+    case 'REJECTED': return 'bg-red-800 text-red-100';
+    default: return 'bg-gray-100 text-gray-800';
+  }
+}
+
   // columns definition
   columnsDef: ColumnDef<LeaveTable>[] = [
     {

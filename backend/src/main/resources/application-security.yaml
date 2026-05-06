@@ -1,0 +1,17 @@
+security:
+  cors:
+    allowed-origins:
+      - http://localhost:4200
+      - http://localhost
+    allowed-methods:
+      - GET
+      - POST
+      - PUT
+      - DELETE
+      - OPTIONS
+    allowed-headers: "*"
+    allow-credentials: true
+    exposed-headers:
+      - Authorization
+      - Content-Type
+    max-age: 3600

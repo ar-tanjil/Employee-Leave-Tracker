@@ -23,7 +23,7 @@ public class AppUserDetailsService implements UserDetailsService {
     @Override
     @Transactional(readOnly = true)
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        UserAccount account = userAccountRepo.findByUsername(username)
+        UserAccount account = userAccountRepo.findByUsernameAndIsDeletedFalse(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
 
         Set<GrantedAuthority> authorities = rolePermissionLoader.loadAuthorities(account.getId());

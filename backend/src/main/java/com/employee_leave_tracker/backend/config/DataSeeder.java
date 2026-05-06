@@ -1,50 +1,54 @@
 package com.employee_leave_tracker.backend.config;
 
-import com.employee_leave_tracker.backend.model.auth.Role;
 import com.employee_leave_tracker.backend.model.auth.UserAccount;
-import com.employee_leave_tracker.backend.model.auth.UserRole;
-import com.employee_leave_tracker.backend.repository.auth.RoleRepository;
 import com.employee_leave_tracker.backend.repository.auth.UserAccountRepository;
-import com.employee_leave_tracker.backend.repository.auth.UserRoleRepository;
-import lombok.RequiredArgsConstructor;
+import org.flywaydb.core.Flyway;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Component;
 
-@Component
-@RequiredArgsConstructor
-public class DataSeeder implements CommandLineRunner {
+import javax.sql.DataSource;
 
-    private final UserAccountRepository userRepository;
-    private final PasswordEncoder passwordEncoder;
-    private final RoleRepository roleRepository;
-    private final UserRoleRepository userRoleRepository;
+@Configuration
+public class DataSeeder {
 
-    @Override
-    public void run(String... args) throws Exception {
-
-        boolean isExist = userRepository.findByUsername("admin")
-                .isPresent();
-
-        if (isExist) {
-            return;
-        }
-
-        UserAccount user = UserAccount.builder()
-                .username("admin")
-                .passwordHash(passwordEncoder.encode("admin@123#"))
-                .status("ACTIVE")
-                .isDeleted(false)
-                .build();
-
-        userRepository.save(user);
-
-        Role role = roleRepository.findByName("SYSTEM_ADMIN")
-                .orElseThrow(() -> new RuntimeException("Role not found"));
-
-        userRoleRepository.save(UserRole.builder()
-                .user(user)
-                .role(role)
-                .build());
+    @Bean
+    public Flyway flyway(DataSource dataSource) {
+        return Flyway.configure()
+                .dataSource(dataSource)
+                .baselineOnMigrate(true)
+                .cleanDisabled(false) // Allows flyway.clean()
+                .load();
     }
+
+    @Bean
+    @Order(1)
+    public CommandLineRunner runFlywayAfterHibernate(Flyway flyway) {
+        return args -> {
+//            // Clean the DB (since you want to wipe it)
+//            flyway.clean();
+            // Run the migration (Insert your data)
+            flyway.migrate();
+        };
+    }
+
+
+    @Bean
+    @Order(2)
+    public CommandLineRunner hashAdminPassword(UserAccountRepository userRepository, PasswordEncoder passwordEncoder) {
+        return args -> {
+            UserAccount user = userRepository.findByUsernameAndIsDeletedFalse("admin")
+                    .orElseThrow(() -> new RuntimeException("Admin user not found"));
+
+            if ("admin@123#".equalsIgnoreCase(user.getPasswordHash())) {
+
+                user.setPasswordHash(passwordEncoder.encode("admin@123#"));
+                userRepository.save(user);
+
+            }
+        };
+    }
+
 }

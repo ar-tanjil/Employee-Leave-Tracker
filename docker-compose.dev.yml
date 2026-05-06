@@ -1,0 +1,42 @@
+
+services:
+  mysql:
+    image: mysql:8
+    container_name: employee-leave-mysql-dev
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: employee_leave_tracker
+      MYSQL_USER: employee_user
+      MYSQL_PASSWORD: employee_pass
+    ports:
+      - "3308:3306"
+    volumes:
+      - mysql_dev_data:/var/lib/mysql
+    networks:
+      - employee-network
+
+  backend:
+    build: ./backend
+    container_name: employee-leave-backend-dev
+    restart: unless-stopped
+    ports:
+      - "8099:8099"
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/employee_leave_tracker?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: root
+      SPRING_DATASOURCE_DRIVER_CLASS_NAME: com.mysql.cj.jdbc.Driver
+      SPRING_JPA_DATABASE_PLATFORM: org.hibernate.dialect.MySQLDialect
+    depends_on:
+      - mysql
+    networks:
+      - employee-network
+
+volumes:
+  mysql_dev_data:
+
+networks:
+  employee-network:
+    driver: bridge

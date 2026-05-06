@@ -7,6 +7,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.nio.channels.FileChannel;
 import java.time.LocalDate;
@@ -33,26 +34,28 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long> {
     Page<Employee> findAllEmployee(Pageable pageable);
 
     @Query("""
-            SELECT  COUNT(e) > 1 FROM Employee e
-             JOIN e.department d
-             JOIN UserAccount u ON e.id = u.employee.id
-             JOIN u.userRoles ur
-             WHERE ur.role.name = 'MANAGER' AND d.id = :departmentId
+            SELECT CASE WHEN COUNT(u) > 0 THEN true ELSE false END
+            FROM UserAccount u
+            JOIN u.employee e
+            JOIN e.department d
+            JOIN u.userRoles ur
+            WHERE d.id = :departmentId 
+            AND ur.role.name = 'MANAGER'
             """)
-    boolean existsManagerForDepartment(Long departmentId);
+    boolean existsManagerForDepartment(@Param("departmentId") Long departmentId);
 
 
     @Query("""
-        SELECT new com.employee_leave_tracker.backend.dto.DashboardDTO(
-        COUNT(DISTINCT emp.id),
-        COUNT(DISTINCT lr.employee.id)
-    )
-    FROM Employee emp
-    LEFT JOIN LeaveRequest lr
-        ON lr.employee.id = emp.id
-        AND :currentDate BETWEEN lr.startDate AND lr.endDate
-    WHERE emp.isDeleted = false
-    """)
+                SELECT new com.employee_leave_tracker.backend.dto.DashboardDTO(
+                COUNT(DISTINCT emp.id),
+                COUNT(DISTINCT lr.employee.id)
+            )
+            FROM Employee emp
+            LEFT JOIN LeaveRequest lr
+                ON lr.employee.id = emp.id
+                AND :currentDate BETWEEN lr.startDate AND lr.endDate
+            WHERE emp.isDeleted = false
+            """)
     DashboardDTO getDashboardData(LocalDate currentDate);
 
     boolean existsByEmail(String email);

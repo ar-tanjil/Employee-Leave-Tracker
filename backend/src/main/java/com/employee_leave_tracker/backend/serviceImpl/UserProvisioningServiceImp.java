@@ -1,5 +1,6 @@
 package com.employee_leave_tracker.backend.serviceImpl;
 
+import com.employee_leave_tracker.backend.constant.UserStatus;
 import com.employee_leave_tracker.backend.dto.auth.PasswordChangeDto;
 import com.employee_leave_tracker.backend.model.auth.Role;
 import com.employee_leave_tracker.backend.model.auth.UserAccount;
@@ -45,7 +46,7 @@ public class UserProvisioningServiceImp implements UserProvisioningService {
                 .employee(employee)
                 .username(username)
                 .passwordHash(passwordEncoder.encode(rawPassword))
-                .status("ACTIVE")
+                .status(UserStatus.ACTIVE)
                 .isDeleted(false)
                 .build();
 
@@ -66,7 +67,7 @@ public class UserProvisioningServiceImp implements UserProvisioningService {
                 .employee(employee)
                 .username(username)
                 .passwordHash(passwordEncoder.encode(employee.getFirstName()))
-                .status("ACTIVE")
+                .status(UserStatus.ACTIVE)
                 .isDeleted(false)
                 .build();
 

@@ -35,7 +35,7 @@ export class NavbarComponent {
 
   // permission method
   get isLeaveApprover() {
-    return this.authService.hasRoles(['ROLE_SYSTEM_ADMIN', 'ROLE_HR_ADMIN', 'LEAVE:APPROVE']);
+    return this.authService.hasRoles(['ROLE_SYSTEM_ADMIN', 'ROLE_HR_ADMIN', 'ROLE_MANAGER']);
   }
 
   get canShowAllEmployee() {

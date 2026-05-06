@@ -3,6 +3,7 @@ package com.employee_leave_tracker.backend.serviceImpl;
 import com.employee_leave_tracker.backend.dto.auth.LoginRequest;
 import com.employee_leave_tracker.backend.dto.auth.LoginResponse;
 import com.employee_leave_tracker.backend.dto.auth.PasswordChangeDto;
+import com.employee_leave_tracker.backend.exception.ArgumentNotValidException;
 import com.employee_leave_tracker.backend.exception.UnauthorizedException;
 import com.employee_leave_tracker.backend.model.auth.UserAccount;
 import com.employee_leave_tracker.backend.repository.auth.UserAccountRepository;
@@ -61,15 +62,15 @@ public class AuthServiceImpl implements AuthService {
         }
 
         UserAccount user = userAccountRepository.findById(principal.getUserId())
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new UnauthorizedException("User not found"));
 
 
         if (!passwordEncoder.matches(request.oldPassword(), user.getPasswordHash())) {
-            throw new IllegalArgumentException("Current password is incorrect");
+            throw new ArgumentNotValidException("Current password is incorrect");
         }
 
         if (passwordEncoder.matches(request.newPassword(), user.getPasswordHash())) {
-            throw new IllegalArgumentException("New password must be different");
+            throw new ArgumentNotValidException("New password must be different");
         }
 
         user.setPasswordHash(passwordEncoder.encode(request.newPassword()));
