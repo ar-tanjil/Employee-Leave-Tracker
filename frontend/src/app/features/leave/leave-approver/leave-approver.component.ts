@@ -1,8 +1,8 @@
+import { LeaveApproverTable } from './../../../models/leave.models';
 import { LeaveService } from './../leave.service';
 import { Component, computed, inject, signal } from '@angular/core';
 import { TableComponent } from "../../../shared/components/table/table.component";
 import { ColumnDef, TableQueryEvent } from '../../../models/table.models';
-import { LeaveApproverTable } from '../../../models/leave.models';
 import { PaginationParams } from '../../../models/api-response.model';
 import { finalize } from 'rxjs';
 import { TableCellDirective } from "../../../shared/directives/table-cell.directive";
@@ -10,10 +10,11 @@ import { DatePipe } from '@angular/common';
 import { IconComponent } from "../../../shared/components/icon/icon.component";
 import { TooltipDirective } from "../../../shared/directives/tooltip.directive";
 import Swal from 'sweetalert2';
+import { LeaveViewComponent } from "../leave-view/leave-view.component";
 
 @Component({
   selector: 'app-leave-approver',
-  imports: [TableComponent, TableCellDirective, DatePipe, IconComponent, TooltipDirective],
+  imports: [TableComponent, TableCellDirective, DatePipe, IconComponent, TooltipDirective, LeaveViewComponent],
   providers: [LeaveService],
   templateUrl: './leave-approver.component.html',
   styleUrl: './leave-approver.component.css',
@@ -22,6 +23,13 @@ export class LeaveApproverComponent {
 
   // inject
   private readonly leaveService = inject(LeaveService);
+
+
+  // child component data
+  readonly selectedLeave = signal<LeaveApproverTable | null>(null);
+
+  // child component state
+  readonly showLeaveDetail = signal(false);
 
 
   // table state
@@ -55,7 +63,7 @@ export class LeaveApproverComponent {
       .pipe(finalize(() => this.loading.set(false)))
       .subscribe((response) => {
         this.leaveList.set(response.data);
-        this.total.set(response.metaData.totalElements);
+        this.total.set(response.data.length);
       });
 
   }
@@ -104,6 +112,17 @@ export class LeaveApproverComponent {
 
     // If result.isDismissed is true, nothing happens.
   }
+
+  openLeaveDetails(data: LeaveApproverTable) {
+    this.selectedLeave.set(data);
+    this.showLeaveDetail.set(true);
+  }
+
+  closeLeaveDetails() {
+    this.selectedLeave.set(null);
+    this.showLeaveDetail.set(false);
+  }
+
 
 
   // columns definition

@@ -34,8 +34,8 @@ export class LoginComponent implements OnInit {
     localStorage.clear();
 
     this.form = this.fb.group({
-      username: ['admin', [Validators.required, Validators.minLength(3)]],
-      password: ['admin@123#', [Validators.required, Validators.minLength(3)]],
+      username: ['', [Validators.required, Validators.minLength(1)]],
+      password: ['', [Validators.required, Validators.minLength(1)]],
     });
   }
 

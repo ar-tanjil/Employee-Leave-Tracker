@@ -1,5 +1,14 @@
 # Employee Leave Tracker
 
+
+![Java](https://img.shields.io/badge/Java-25%2B-blue)
+![Spring Boot](https://img.shields.io/badge/Spring%20Boot-4.0.6-green)
+![Security](https://img.shields.io/badge/Security-JWT-orange)
+![Database](https://img.shields.io/badge/Database-MySQL-blue)
+![License](https://img.shields.io/badge/License-Internal-lightgrey)
+
+---
+
 A comprehensive full-stack web application for managing employee leave requests, approvals, and organizational leave policies with role-based access control and real-time notifications.
 
 ## 🏗️ Architecture Overview
